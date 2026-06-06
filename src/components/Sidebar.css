@@ -1,0 +1,135 @@
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg,
+    #FFFFFF 7%,
+    #FBFDF8 26%,
+    #F0F7E2 51%,
+    #E6F1CE 100%
+  );
+  padding: 24px 16px;
+  transition: width 0.25s ease;
+  overflow: hidden;
+}
+
+.sidebar--collapsed {
+  width: 80px;
+  padding: 24px 12px;
+}
+
+/* Logo */
+.sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 28px;
+  overflow: hidden;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  width: 100%;
+}
+
+.sidebar--collapsed .sidebar__logo {
+  justify-content: center;
+  padding: 0 0 20px;
+}
+
+.sidebar__logo-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.sidebar__logo-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1A2332;
+}
+
+/* Nav */
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.sidebar__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 450;
+  color: #4B5563;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar--collapsed .sidebar__nav-item {
+  justify-content: center;
+  padding: 10px;
+}
+
+.sidebar__nav-item:hover {
+  background: rgba(91, 155, 122, 0.1);
+  color: #3D7A5E;
+}
+
+.sidebar__nav-item--active {
+  background: linear-gradient(270deg, #84B32D 0%, #78A329 54%, #6B9126 100%);
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.sidebar__nav-item--active:hover {
+  background: linear-gradient(270deg, #78A329 0%, #6B9126 100%);
+  color: #ffffff;
+}
+
+.sidebar__nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar__nav-label {
+  line-height: 1;
+}
+
+/* Divider */
+.sidebar__divider {
+  height: 1px;
+  background: #D4E9C0;
+  margin: 16px 0;
+}
+
+/* Bottom section */
+.sidebar__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar__nav-item--logout {
+  color: #DC2626;
+  margin-top: 4px;
+}
+
+.sidebar__nav-item--logout:hover {
+  background: rgba(220, 38, 38, 0.08);
+  color: #DC2626;
+}

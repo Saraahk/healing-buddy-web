@@ -1,0 +1,224 @@
+.admin-analytics {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* KPIs */
+.admin-analytics__kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.admin-analytics__kpi {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-analytics__kpi-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1;
+}
+
+.admin-analytics__kpi-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.admin-analytics__kpi-sub {
+  font-size: 11.5px;
+  font-weight: 500;
+}
+.admin-analytics__kpi-sub--up   { color: #16a34a; }
+.admin-analytics__kpi-sub--down { color: #dc2626; }
+
+/* Row layout */
+.admin-analytics__row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 16px;
+}
+
+/* Cards */
+.admin-analytics__card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.admin-analytics__card--wide { /* uses grid proportion */ }
+
+.admin-analytics__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-analytics__card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.admin-analytics__legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-gray);
+}
+
+.admin-analytics__legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+/* Bar chart */
+.admin-analytics__chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 20px 20px 14px;
+  height: 200px;
+}
+
+.admin-analytics__chart--monthly {
+  height: 180px;
+}
+
+.admin-analytics__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+.admin-analytics__bars {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  width: 100%;
+}
+
+.admin-analytics__bar {
+  flex: 1;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: opacity 0.12s;
+  cursor: default;
+}
+.admin-analytics__bar:hover { opacity: 0.75; }
+
+.admin-analytics__day {
+  font-size: 11px;
+  color: var(--text-gray);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* Doctor leaderboard */
+.admin-analytics__doctor-list {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+.admin-analytics__doctor-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.admin-analytics__doctor-row:last-child { border-bottom: none; }
+
+.admin-analytics__doctor-rank {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9ca3af;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.admin-analytics__doctor-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-analytics__doctor-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-analytics__doctor-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-analytics__doctor-spec {
+  font-size: 11px;
+  color: var(--text-gray);
+}
+
+.admin-analytics__score-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  width: 60px;
+}
+
+.admin-analytics__score {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.admin-analytics__score-bar-wrap {
+  width: 100%;
+  height: 4px;
+  background: #f3f4f6;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.admin-analytics__score-bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  max-width: 100%;
+}

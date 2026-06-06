@@ -1,0 +1,123 @@
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.admin-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  position: relative;
+}
+
+.admin-topbar__back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-gray);
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.admin-topbar__back-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: #d0e8a0;
+}
+
+.admin-topbar__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1;
+}
+
+.admin-topbar__underline {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 3px;
+  background: #a8d57a;
+  border-radius: 2px 2px 0 0;
+}
+
+.admin-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.admin-topbar__user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: default;
+}
+
+.admin-topbar__avatar-wrap {
+  position: relative;
+}
+
+.admin-topbar__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #84B32D, #5a8020);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border);
+}
+
+.admin-topbar__online {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #fff;
+}
+
+.admin-topbar__user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.admin-topbar__user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1;
+}
+
+.admin-topbar__user-role {
+  font-size: 11px;
+  color: var(--text-gray);
+  line-height: 1;
+}
