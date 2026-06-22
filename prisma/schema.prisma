@@ -1,0 +1,655 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// =============================================
+// 1. User
+// role: 'Patient' | 'Doctor' | 'Healing Buddy' | 'Family Member' | 'Admin'
+// account_status: 'Active' | 'Disabled' | 'Pending' | 'Suspended'
+// =============================================
+model User {
+  id                          String    @id @default(uuid()) @db.VarChar(36)
+  email                       String    @unique @db.VarChar(100)
+  password_hash               String    @db.VarChar(255)
+  full_name                   String    @db.VarChar(100)
+  phone                       String?   @db.VarChar(20)
+  avatar_url                  String?   @db.VarChar(500)
+  avatar_initials             String?   @db.VarChar(10)
+  role                        String    @db.VarChar(50)
+  account_status              String    @default("Active") @db.VarChar(20)
+  is_verified                 Boolean   @default(false)
+  verification_otp            String?   @db.VarChar(10)
+  verification_otp_expires_at DateTime?
+  credentials_sent_at         DateTime?
+  last_active_at              DateTime?
+  last_login_at               DateTime?
+  notification_enabled        Boolean   @default(true)
+  created_at                  DateTime  @default(now())
+  updated_at                  DateTime  @updatedAt
+
+  patient                     Patient?
+  doctor                      Doctor?
+  healing_buddy               HealingBuddy?
+  family_member               FamilyMember?
+  admin                       Admin?
+  uploaded_documents          UploadedDocument[]
+  doctor_requests_reviewed    DoctorRequest[]         @relation("ReviewedBy")
+  community_posts             CommunityPost[]
+  community_post_likes        CommunityPostLike[]
+  community_post_comments     CommunityPostComment[]
+  reports_submitted           CommunityPostReport[]   @relation("ReportedBy")
+  reports_resolved            CommunityPostReport[]   @relation("ResolvedBy")
+  announcements_sent          Announcement[]          @relation("SentBy")
+  announcements_created       Announcement[]          @relation("CreatedBy")
+  announcement_recipients     AnnouncementRecipient[]
+  activity_logs               UserActivityLog[]
+  doctors_verified            Doctor[]                @relation("VerifiedBy")
+
+  @@map("users")
+}
+
+// =============================================
+// 2. Patient
+// age is computed from date_of_birth in application code
+// gender: 'Male' | 'Female' | 'Other' | 'Prefer not to say'
+// severity: 'Early' | 'Moderate' | 'Advanced' | 'Critical'
+// preferred_consultation_type: 'In-Clinic' | 'Telehealth' | 'Both'
+// =============================================
+model Patient {
+  id                              String    @id @default(uuid()) @db.VarChar(36)
+  user_id                         String    @unique @db.VarChar(36)
+  date_of_birth                   DateTime? @db.Date
+  gender                          String?   @db.VarChar(20)
+  blood_type                      String?   @db.VarChar(5)
+  emergency_contact_name          String?   @db.VarChar(100)
+  emergency_contact_phone         String?   @db.VarChar(20)
+  emergency_contact_relationship  String?   @db.VarChar(50)
+  primary_condition               String?   @db.VarChar(100)
+  severity                        String?   @db.VarChar(50)
+  diagnosed_year                  Int?
+  onboarding_completed            Boolean   @default(false)
+  onboarding_completed_at         DateTime?
+  health_assessment_last_updated  DateTime?
+  joined_date                     DateTime  @db.Date
+  last_active                     DateTime? @db.Date
+  months_on_platform              Int       @default(0)
+  healing_notes_count             Int       @default(0)
+  medical_documents_count         Int       @default(0)
+  appointments_count              Int       @default(0)
+  preferred_consultation_type     String?   @db.VarChar(20)
+  created_at                      DateTime  @default(now())
+  updated_at                      DateTime  @updatedAt
+
+  user                            User                      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  family_connections              FamilyPatientConnection[]
+  doctor_assignments              DoctorPatientAssignment[]
+  healing_buddy_assignments       PatientHealingBuddy[]
+  appointments                    Appointment[]
+  session_notes                   SessionNote[]
+  mood_entries                    MoodEntry[]
+  healing_notes                   HealingNote[]
+  doctor_ratings                  DoctorRating[]
+  uploaded_documents              UploadedDocument[]
+
+  @@map("patients")
+}
+
+// =============================================
+// 3. Doctor
+// =============================================
+model Doctor {
+  id                    String    @id @default(uuid()) @db.VarChar(36)
+  user_id               String    @unique @db.VarChar(36)
+  specialty             String    @db.VarChar(100)
+  sub_specialty         String?   @db.VarChar(100)
+  license_number        String?   @unique @db.VarChar(100)
+  years_of_experience   Int?
+  biography             String?   @db.Text
+  consultation_fee      Decimal?  @db.Decimal(10, 2)
+  telehealth_enabled    Boolean   @default(true)
+  in_clinic_enabled     Boolean   @default(true)
+  clinic_address        String?   @db.Text
+  clinic_city           String?   @db.VarChar(100)
+  clinic_zip_code       String?   @db.VarChar(20)
+  rating_average        Decimal   @default(0) @db.Decimal(3, 2)
+  rating_count          Int       @default(0)
+  is_verified           Boolean   @default(false)
+  verified_at           DateTime?
+  verified_by           String?   @db.VarChar(36)
+  joined_at             DateTime  @db.Date
+  total_patients        Int       @default(0)
+  sessions_count        Int       @default(0)
+  session_notes_count   Int       @default(0)
+  recommendations_count Int       @default(0)
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  user                  User                      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  verified_by_user      User?                     @relation("VerifiedBy", fields: [verified_by], references: [id])
+  patient_assignments   DoctorPatientAssignment[]
+  buddy_assignments     PatientHealingBuddy[]
+  appointments          Appointment[]
+  session_notes         SessionNote[]
+  ratings               DoctorRating[]
+  rankings              DoctorRanking[]
+  doctor_requests       DoctorRequest[]
+
+  @@map("doctors")
+}
+
+// =============================================
+// 4. HealingBuddy
+// average_response_time_min: stored in minutes (MySQL has no INTERVAL type)
+// =============================================
+model HealingBuddy {
+  id                        String    @id @default(uuid()) @db.VarChar(36)
+  user_id                   String    @unique @db.VarChar(36)
+  professional_title        String?   @db.VarChar(100)
+  certifications            String?   @db.Text
+  joined_at                 DateTime  @db.Date
+  checkins_count            Int       @default(0)
+  messages_sent_count       Int       @default(0)
+  response_rate             Decimal   @default(0) @db.Decimal(5, 2)
+  average_response_time_min Int?
+  supporting_patients_count Int       @default(0)
+  reports_submitted_count   Int       @default(0)
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+
+  user                      User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  patient_assignments       PatientHealingBuddy[]
+  healing_notes             HealingNote[]
+
+  @@map("healing_buddies")
+}
+
+// =============================================
+// 5. FamilyMember
+// =============================================
+model FamilyMember {
+  id                    String    @id @default(uuid()) @db.VarChar(36)
+  user_id               String    @unique @db.VarChar(36)
+  relationship_default  String?   @db.VarChar(50)
+  joined_at             DateTime  @db.Date
+  linked_patients_count Int       @default(0)
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  user                  User                      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  patient_connections   FamilyPatientConnection[]
+
+  @@map("family_members")
+}
+
+// =============================================
+// 6. Admin
+// admin_role: 'Super Admin' | 'Content Manager' | 'User Manager' | 'Analytics Viewer'
+// =============================================
+model Admin {
+  id             String    @id @default(uuid()) @db.VarChar(36)
+  user_id        String    @unique @db.VarChar(36)
+  admin_role     String?   @db.VarChar(50)
+  permissions    Json      @default("{}")
+  joined_at      DateTime  @db.Date
+  last_action_at DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  user           User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("admins")
+}
+
+// =============================================
+// 7. FamilyPatientConnection
+// status: 'Pending' | 'Active' | 'Declined' | 'Expired' | 'Revoked'
+// =============================================
+model FamilyPatientConnection {
+  id                           String    @id @default(uuid()) @db.VarChar(36)
+  patient_id                   String    @db.VarChar(36)
+  family_member_id             String?   @db.VarChar(36)
+  family_member_email          String?   @db.VarChar(100)
+  family_member_name           String?   @db.VarChar(100)
+  relationship                 String    @db.VarChar(50)
+  status                       String    @default("Pending") @db.VarChar(20)
+  requested_at                 DateTime  @default(now())
+  responded_at                 DateTime?
+  connected_since              DateTime? @db.Date
+  disconnected_at              DateTime?
+  expires_at                   DateTime?
+  invitation_code              String?   @db.VarChar(50)
+  disconnected_reason          String?   @db.VarChar(255)
+  can_view_mood                Boolean   @default(true)
+  can_view_documents           Boolean   @default(false)
+  can_chat_with_doctor         Boolean   @default(false)
+  can_chat_with_healing_buddy  Boolean   @default(false)
+  can_receive_emergency_alerts Boolean   @default(true)
+  created_at                   DateTime  @default(now())
+  updated_at                   DateTime  @updatedAt
+
+  patient                      Patient       @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  family_member                FamilyMember? @relation(fields: [family_member_id], references: [id], onDelete: Cascade)
+
+  @@unique([patient_id, family_member_id])
+  @@map("family_patient_connections")
+}
+
+// =============================================
+// 8. DoctorPatientAssignment
+// =============================================
+model DoctorPatientAssignment {
+  id             String    @id @default(uuid()) @db.VarChar(36)
+  doctor_id      String    @db.VarChar(36)
+  patient_id     String    @db.VarChar(36)
+  assigned_since DateTime  @db.Date
+  is_primary     Boolean   @default(true)
+  patient_status String    @default("Active") @db.VarChar(50)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  doctor         Doctor    @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+  patient        Patient   @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+
+  @@unique([doctor_id, patient_id])
+  @@map("doctor_patient_assignments")
+}
+
+// =============================================
+// 9. PatientHealingBuddy
+// =============================================
+model PatientHealingBuddy {
+  id                   String    @id @default(uuid()) @db.VarChar(36)
+  healing_buddy_id     String    @db.VarChar(36)
+  patient_id           String    @db.VarChar(36)
+  relationship_type    String?   @db.VarChar(50)
+  assigned_doctor_name String?   @db.VarChar(100)
+  assigned_doctor_id   String?   @db.VarChar(36)
+  support_since        DateTime  @db.Date
+  support_until        DateTime? @db.Date
+  is_active            Boolean   @default(true)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+
+  healing_buddy        HealingBuddy @relation(fields: [healing_buddy_id], references: [id], onDelete: Cascade)
+  patient              Patient      @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  assigned_doctor      Doctor?      @relation(fields: [assigned_doctor_id], references: [id])
+
+  @@unique([healing_buddy_id, patient_id])
+  @@map("patient_healing_buddies")
+}
+
+// =============================================
+// 10. Appointment
+// type: 'In-Clinic' | 'Telehealth'
+// status: 'Scheduled' | 'Completed' | 'Cancelled' | 'No-Show'
+// =============================================
+model Appointment {
+  id               String    @id @default(uuid()) @db.VarChar(36)
+  patient_id       String    @db.VarChar(36)
+  doctor_id        String    @db.VarChar(36)
+  appointment_date DateTime
+  duration_minutes Int       @default(30)
+  type             String?   @db.VarChar(20)
+  status           String    @default("Scheduled") @db.VarChar(20)
+  chief_complaint  String?   @db.Text
+  notes            String?   @db.Text
+  cancelled_reason String?   @db.VarChar(255)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  patient          Patient   @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  doctor           Doctor    @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+  session_notes    SessionNote[]
+
+  @@index([patient_id])
+  @@index([doctor_id])
+  @@index([appointment_date])
+  @@map("appointments")
+}
+
+// =============================================
+// 11. SessionNote
+// =============================================
+model SessionNote {
+  id                    String       @id @default(uuid()) @db.VarChar(36)
+  doctor_id             String       @db.VarChar(36)
+  patient_id            String       @db.VarChar(36)
+  appointment_id        String?      @db.VarChar(36)
+  note_content          String       @db.Text
+  is_visible_to_patient Boolean      @default(false)
+  is_visible_to_buddy   Boolean      @default(false)
+  created_at            DateTime     @default(now())
+  updated_at            DateTime     @updatedAt
+
+  doctor                Doctor       @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+  patient               Patient      @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  appointment           Appointment? @relation(fields: [appointment_id], references: [id], onDelete: SetNull)
+
+  @@index([patient_id])
+  @@index([doctor_id])
+  @@map("session_notes")
+}
+
+// =============================================
+// 12. MoodEntry
+// mood_type: 'Happy' | 'Sad' | 'Angry' | 'Fear' | 'Anxious' | 'Hopeful' | 'Tired' | 'Calm' | 'Frustrated' | 'Grateful'
+// =============================================
+model MoodEntry {
+  id                    String    @id @default(uuid()) @db.VarChar(36)
+  patient_id            String    @db.VarChar(36)
+  mood_type             String?   @db.VarChar(20)
+  mood_note             String?   @db.VarChar(255)
+  entry_date            DateTime  @db.Date
+  is_shared_with_family Boolean   @default(true)
+  is_shared_with_buddy  Boolean   @default(true)
+  is_shared_with_doctor Boolean   @default(true)
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  patient               Patient     @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  healing_notes         HealingNote[]
+
+  @@index([patient_id, entry_date])
+  @@map("mood_entries")
+}
+
+// =============================================
+// 13. HealingNote
+// =============================================
+model HealingNote {
+  id               String    @id @default(uuid()) @db.VarChar(36)
+  healing_buddy_id String    @db.VarChar(36)
+  patient_id       String    @db.VarChar(36)
+  note_content     String    @db.Text
+  checkin_date     DateTime  @db.Date
+  mood_reference   String?   @db.VarChar(36)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  healing_buddy    HealingBuddy @relation(fields: [healing_buddy_id], references: [id], onDelete: Cascade)
+  patient          Patient      @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  mood_entry       MoodEntry?   @relation(fields: [mood_reference], references: [id], onDelete: SetNull)
+
+  @@index([patient_id])
+  @@map("healing_notes")
+}
+
+// =============================================
+// 14. DoctorRating
+// =============================================
+model DoctorRating {
+  id          String    @id @default(uuid()) @db.VarChar(36)
+  doctor_id   String    @db.VarChar(36)
+  patient_id  String    @db.VarChar(36)
+  rating      Decimal   @db.Decimal(2, 1)
+  review_text String?   @db.Text
+  rated_at    DateTime  @default(now())
+
+  doctor      Doctor    @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+  patient     Patient   @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+
+  @@unique([doctor_id, patient_id])
+  @@map("doctor_ratings")
+}
+
+// =============================================
+// 15. UploadedDocument
+// file_size: in bytes
+// document_type: 'Lab Result' | 'Prescription' | 'Imaging' | 'Discharge Summary' | 'Referral' | 'Insurance' | 'Other'
+// =============================================
+model UploadedDocument {
+  id                    String    @id @default(uuid()) @db.VarChar(36)
+  patient_id            String    @db.VarChar(36)
+  document_name         String    @db.VarChar(255)
+  document_path         String    @db.VarChar(500)
+  file_size             BigInt?
+  document_type         String?   @db.VarChar(50)
+  document_date         DateTime  @db.Date
+  uploaded_by           String?   @db.VarChar(36)
+  is_shared_with_family Boolean   @default(false)
+  is_shared_with_doctor Boolean   @default(true)
+  is_shared_with_buddy  Boolean   @default(true)
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  patient               Patient   @relation(fields: [patient_id], references: [id], onDelete: Cascade)
+  uploader              User?     @relation(fields: [uploaded_by], references: [id])
+
+  @@index([patient_id])
+  @@map("uploaded_documents")
+}
+
+// =============================================
+// 16. DoctorRequest
+// status: 'Pending' | 'Approved' | 'Rejected'
+// doctor_id: filled when status becomes 'Approved'
+// =============================================
+model DoctorRequest {
+  id                           String    @id @default(uuid()) @db.VarChar(36)
+  full_name                    String    @db.VarChar(100)
+  email                        String    @unique @db.VarChar(100)
+  phone_number                 String    @db.VarChar(20)
+  years_of_experience          Int
+  medical_specialty            String    @db.VarChar(100)
+  medical_license_no           String    @db.VarChar(100)
+  cv_document_path             String?   @db.VarChar(500)
+  medical_degree_document_path String?   @db.VarChar(500)
+  brief_introduction           String?   @db.Text
+  status                       String    @default("Pending") @db.VarChar(20)
+  reviewed_by                  String?   @db.VarChar(36)
+  review_notes                 String?   @db.Text
+  reviewed_at                  DateTime?
+  doctor_id                    String?   @db.VarChar(36)
+  request_date                 DateTime  @default(now())
+  created_at                   DateTime  @default(now())
+  updated_at                   DateTime  @updatedAt
+
+  reviewer                     User?     @relation("ReviewedBy", fields: [reviewed_by], references: [id])
+  doctor                       Doctor?   @relation(fields: [doctor_id], references: [id], onDelete: SetNull)
+
+  @@map("doctor_requests")
+}
+
+// =============================================
+// 17. CommunityPost
+// =============================================
+model CommunityPost {
+  id                  String    @id @default(uuid()) @db.VarChar(36)
+  author_id           String    @db.VarChar(36)
+  author_role_at_time String    @db.VarChar(50)
+  content             String    @db.Text
+  likes_count         Int       @default(0)
+  comments_count      Int       @default(0)
+  is_reported         Boolean   @default(false)
+  reports_count       Int       @default(0)
+  posted_at           DateTime  @default(now())
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  author              User                   @relation(fields: [author_id], references: [id], onDelete: Cascade)
+  likes               CommunityPostLike[]
+  comments            CommunityPostComment[]
+  reports             CommunityPostReport[]
+
+  @@index([author_id])
+  @@map("community_posts")
+}
+
+// =============================================
+// 18. CommunityPostLike
+// =============================================
+model CommunityPostLike {
+  id       String    @id @default(uuid()) @db.VarChar(36)
+  post_id  String    @db.VarChar(36)
+  user_id  String    @db.VarChar(36)
+  liked_at DateTime  @default(now())
+
+  post     CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user     User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([post_id, user_id])
+  @@map("community_post_likes")
+}
+
+// =============================================
+// 19. CommunityPostComment
+// =============================================
+model CommunityPostComment {
+  id           String    @id @default(uuid()) @db.VarChar(36)
+  post_id      String    @db.VarChar(36)
+  author_id    String    @db.VarChar(36)
+  comment_text String    @db.Text
+  likes_count  Int       @default(0)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  post         CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  author       User          @relation(fields: [author_id], references: [id])
+
+  @@map("community_post_comments")
+}
+
+// =============================================
+// 20. CommunityPostReport
+// resolution: 'Kept' | 'Removed' | 'Ignored'
+// =============================================
+model CommunityPostReport {
+  id            String    @id @default(uuid()) @db.VarChar(36)
+  post_id       String    @db.VarChar(36)
+  reported_by   String    @db.VarChar(36)
+  report_reason String?   @db.VarChar(255)
+  reported_at   DateTime  @default(now())
+  resolved_at   DateTime?
+  resolution    String?   @db.VarChar(50)
+  resolved_by   String?   @db.VarChar(36)
+  created_at    DateTime  @default(now())
+
+  post          CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  reporter      User          @relation("ReportedBy", fields: [reported_by], references: [id])
+  resolver      User?         @relation("ResolvedBy", fields: [resolved_by], references: [id])
+
+  @@map("community_post_reports")
+}
+
+// =============================================
+// 21. Announcement
+// status: 'Draft' | 'Sent'
+// =============================================
+model Announcement {
+  id              String    @id @default(uuid()) @db.VarChar(36)
+  title           String    @db.VarChar(255)
+  message         String    @db.Text
+  target_audience Json
+  status          String    @default("Draft") @db.VarChar(20)
+  sent_by         String?   @db.VarChar(36)
+  sent_at         DateTime?
+  created_by      String    @db.VarChar(36)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  sender          User?                   @relation("SentBy", fields: [sent_by], references: [id])
+  creator         User                    @relation("CreatedBy", fields: [created_by], references: [id])
+  recipients      AnnouncementRecipient[]
+
+  @@map("announcements")
+}
+
+// =============================================
+// 22. AnnouncementRecipient
+// =============================================
+model AnnouncementRecipient {
+  id              String    @id @default(uuid()) @db.VarChar(36)
+  announcement_id String    @db.VarChar(36)
+  user_id         String    @db.VarChar(36)
+  is_read         Boolean   @default(false)
+  read_at         DateTime?
+  created_at      DateTime  @default(now())
+
+  announcement    Announcement @relation(fields: [announcement_id], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [user_id], references: [id])
+
+  @@unique([announcement_id, user_id])
+  @@map("announcement_recipients")
+}
+
+// =============================================
+// 23. AnalyticsSummary
+// =============================================
+model AnalyticsSummary {
+  id                               String   @id @default(uuid()) @db.VarChar(36)
+  date                             DateTime @unique @db.Date
+  patient_posts_count              Int      @default(0)
+  healing_notes_written_count      Int      @default(0)
+  family_posts_count               Int      @default(0)
+  support_sessions_count           Int      @default(0)
+  medical_documents_uploaded_count Int      @default(0)
+  family_connections_count         Int      @default(0)
+  created_at                       DateTime @default(now())
+  updated_at                       DateTime @updatedAt
+
+  @@map("analytics_summary")
+}
+
+// =============================================
+// 24. WeeklyUserActivity
+// day_of_week: 'Monday' | 'Tuesday' | ... | 'Sunday'
+// =============================================
+model WeeklyUserActivity {
+  id                     String   @id @default(uuid()) @db.VarChar(36)
+  week_start_date        DateTime @db.Date
+  day_of_week            String   @db.VarChar(10)
+  patients_active        Int      @default(0)
+  doctors_active         Int      @default(0)
+  healing_buddies_active Int      @default(0)
+  family_members_active  Int      @default(0)
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+
+  @@unique([week_start_date, day_of_week])
+  @@map("weekly_user_activity")
+}
+
+// =============================================
+// 25. DoctorRanking
+// =============================================
+model DoctorRanking {
+  id                   String   @id @default(uuid()) @db.VarChar(36)
+  doctor_id            String   @db.VarChar(36)
+  rank_position        Int
+  total_patients_count Int      @default(0)
+  average_rating       Decimal  @default(0) @db.Decimal(3, 2)
+  ranking_date         DateTime @db.Date
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  doctor               Doctor   @relation(fields: [doctor_id], references: [id], onDelete: Cascade)
+
+  @@unique([doctor_id, ranking_date])
+  @@map("doctor_rankings")
+}
+
+// =============================================
+// 26. UserActivityLog
+// ip_address: VarChar(45) supports both IPv4 and IPv6
+// =============================================
+model UserActivityLog {
+  id          String    @id @default(uuid()) @db.VarChar(36)
+  user_id     String    @db.VarChar(36)
+  action      String    @db.VarChar(100)
+  entity_type String?   @db.VarChar(50)
+  entity_id   String?   @db.VarChar(36)
+  ip_address  String?   @db.VarChar(45)
+  user_agent  String?   @db.Text
+  details     Json?
+  created_at  DateTime  @default(now())
+
+  user        User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([created_at])
+  @@map("user_activity_log")
+}
