@@ -18,9 +18,41 @@ import { HealingNotesModule } from './healing-notes/healing-notes.module';
 import { DoctorRatingsModule } from './doctor-ratings/doctor-ratings.module';
 import { UploadedDocumentsModule } from './uploaded-documents/uploaded-documents.module';
 import { DoctorRequestsModule } from './doctor-requests/doctor-requests.module';
+import { AuthModule } from './auth/auth.module';
+import { AnalyticsSummaryModule } from './analytics/analytics-summary/analytics-summary.module';
+import { WeeklyActivityModule } from './analytics/weekly-activity/weekly-activity.module';
+import { DoctorRankingModule } from './analytics/doctor-ranking/doctor-ranking.module';
+import { CommunityPostsModule } from './community/posts/community-posts.module';
+import { CommunityPostReportsModule } from './community/post-reports/community-post-reports.module';
+import { AnnouncementModule } from './announcements/announcement/announcement.module';
 
 @Module({
-  imports: [UsersModule, PrismaModule, PatientsModule, DoctorsModule, HealingBuddyModule, FamilyMembersModule, AdminModule, FamilyPatientConnectionsModule, DoctorPatientAssignmentsModule, PatientHealingBuddiesModule, AppointmentsModule, SessionNotesModule, MoodEntriesModule, HealingNotesModule, DoctorRatingsModule, UploadedDocumentsModule, DoctorRequestsModule],
+  imports: [
+    UsersModule,
+    PrismaModule,
+    PatientsModule,
+    DoctorsModule,
+    HealingBuddyModule,
+    FamilyMembersModule,
+    AdminModule,
+    FamilyPatientConnectionsModule,
+    DoctorPatientAssignmentsModule,
+    PatientHealingBuddiesModule,
+    AppointmentsModule,
+    SessionNotesModule,
+    MoodEntriesModule,
+    HealingNotesModule,
+    DoctorRatingsModule,
+    UploadedDocumentsModule,
+    DoctorRequestsModule,
+    AuthModule,
+    AnalyticsSummaryModule,
+    WeeklyActivityModule,
+    DoctorRankingModule,
+    CommunityPostsModule,
+    CommunityPostReportsModule,
+    AnnouncementModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -15,6 +15,16 @@ export class SessionNotesController {
     return this.service.findAll();
   }
 
+  @Get('doctor/:doctorId')
+  findByDoctor(@Param('doctorId') doctorId: string) {
+    return this.service.findByDoctor(doctorId);
+  }
+
+  @Get('patient/:patientId')
+  findByPatient(@Param('patientId') patientId: string) {
+    return this.service.findByPatient(patientId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.service.findOne(id);

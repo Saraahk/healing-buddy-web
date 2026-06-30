@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param } from '@nestjs/common';
 import { AnnouncementService } from './announcement.service';
 import { CreateAnnouncementDto } from './announcement.dto';
 
@@ -14,6 +14,16 @@ export class AnnouncementController {
   @Post()
   createAnnouncement(@Body() dto: CreateAnnouncementDto) {
     return this.announcementService.createAnnouncement(dto);
+  }
+
+  @Patch(':id/send')
+  sendAnnouncement(@Param('id') id: string) {
+    return this.announcementService.sendAnnouncement(id);
+  }
+
+  @Get('doctor/notifications')
+  getForDoctor() {
+    return this.announcementService.getSentForDoctor();
   }
 
   @Delete(':id')

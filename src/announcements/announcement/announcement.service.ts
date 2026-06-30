@@ -24,9 +24,25 @@ export class AnnouncementService {
     });
   }
 
+  async sendAnnouncement(id: string) {
+    return this.prisma.announcement.update({
+      where: { id },
+      data: { status: 'Sent', sent_at: new Date() },
+    });
+  }
+
   async deleteAnnouncement(id: string) {
     return this.prisma.announcement.delete({
       where: { id },
+    });
+  }
+
+  async getSentForDoctor() {
+    return this.prisma.announcement.findMany({
+      where: { status: 'Sent' },
+      orderBy: { sent_at: 'desc' },
+      take: 20,
+      select: { id: true, title: true, message: true, sent_at: true },
     });
   }
 }

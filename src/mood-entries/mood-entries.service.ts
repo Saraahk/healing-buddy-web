@@ -50,4 +50,12 @@ export class MoodEntriesService {
     await this.findOne(id);
     return this.prisma.moodEntry.delete({ where: { id } });
   }
+
+  findByPatient(patientId: string) {
+    return this.prisma.moodEntry.findMany({
+      where: { patient_id: patientId },
+      orderBy: { entry_date: 'desc' },
+      take: 30,
+    });
+  }
 }

@@ -9,6 +9,16 @@ export class CommunityPostsService {
   async getAllPosts() {
     return this.prisma.communityPost.findMany({
       orderBy: { posted_at: 'desc' },
+      include: {
+        author: { select: { full_name: true, role: true } },
+      },
+    });
+  }
+
+  async keepPost(id: string) {
+    return this.prisma.communityPost.update({
+      where: { id },
+      data: { is_reported: false, reports_count: 0 },
     });
   }
 

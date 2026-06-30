@@ -57,5 +57,10 @@ export class CreateDoctorRequestDto {
   @IsString()
   @IsOptional()
   @MaxLength(500)
+  avatar_url?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(500)
   brief_introduction?: string;
 }

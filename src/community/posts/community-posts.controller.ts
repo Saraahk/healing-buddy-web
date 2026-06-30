@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param } from '@nestjs/common';
 import { CommunityPostsService } from './community-posts.service';
 import { CreatePostDto } from './community-posts.dto';
 
@@ -14,6 +14,11 @@ export class CommunityPostsController {
   @Post()
   createPost(@Body() dto: CreatePostDto) {
     return this.communityPostsService.createPost(dto);
+  }
+
+  @Patch(':id/keep')
+  keepPost(@Param('id') id: string) {
+    return this.communityPostsService.keepPost(id);
   }
 
   @Delete(':id')

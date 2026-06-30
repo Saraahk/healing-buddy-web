@@ -35,7 +35,18 @@ export class DoctorRequestsService {
     }
 
     return this.prisma.doctorRequest.create({
-      data: createDoctorRequestDto,
+      data: {
+        full_name:                   createDoctorRequestDto.full_name,
+        email:                       createDoctorRequestDto.email,
+        phone_number:                createDoctorRequestDto.phone_number,
+        years_of_experience:         createDoctorRequestDto.years_of_experience,
+        medical_specialty:           createDoctorRequestDto.medical_specialty,
+        medical_license_no:          createDoctorRequestDto.medical_license_no,
+        brief_introduction:          createDoctorRequestDto.brief_introduction,
+        cv_document_path:            createDoctorRequestDto.cv_document_path,
+        medical_degree_document_path: createDoctorRequestDto.medical_degree_document_path,
+        avatar_url:                  createDoctorRequestDto.avatar_url,
+      },
     });
   }
 
@@ -165,6 +176,7 @@ export class DoctorRequestsService {
           role: 'Doctor',
           account_status: 'Active',
           is_verified: true,
+          avatar_url: (request as any).avatar_url ?? null,
         }
       });
 
@@ -215,10 +227,9 @@ export class DoctorRequestsService {
         }
       });
 
-      // In production, send the temporary password via email
       console.log(`Temporary password for ${request.email}: ${tempPassword}`);
-      
-      return updatedRequest;
+
+      return { ...updatedRequest, temp_password: tempPassword };
     });
   }
 

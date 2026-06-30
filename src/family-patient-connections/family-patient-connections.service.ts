@@ -57,4 +57,11 @@ export class FamilyPatientConnectionsService {
     await this.findOne(id);
     return this.prisma.familyPatientConnection.delete({ where: { id } });
   }
+
+  findByPatient(patientId: string) {
+    return this.prisma.familyPatientConnection.findMany({
+      where: { patient_id: patientId },
+      include: { family_member: { include: { user: { select: { full_name: true, avatar_url: true, phone: true } } } } },
+    });
+  }
 }

@@ -40,6 +40,14 @@ export class PatientsService {
     return this.prisma.patient.findMany({ include: { user: true } });
   }
 
+  findByDoctor(doctorId: string) {
+    return this.prisma.patient.findMany({
+      where: { doctor_assignments: { some: { doctor_id: doctorId } } },
+      include: { user: { select: { full_name: true, avatar_url: true, email: true, phone: true } } },
+      orderBy: { joined_date: 'desc' },
+    });
+  }
+
   async findOne(id: string) {
     const patient = await this.prisma.patient.findUnique({
       where: { id },

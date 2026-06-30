@@ -7,10 +7,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
     const adapter = new PrismaMariaDb({
       host: 'localhost',
-      port: 3306,
+      port: 3308,
       user: 'root',
       password: '',
-      database: 'healing_db',
+      database: 'healing',
     });
     super({ adapter });
   }

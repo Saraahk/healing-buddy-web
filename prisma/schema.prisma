@@ -438,6 +438,7 @@ model DoctorRequest {
   medical_license_no           String    @db.VarChar(100)
   cv_document_path             String?   @db.VarChar(500)
   medical_degree_document_path String?   @db.VarChar(500)
+  avatar_url                   String?   @db.VarChar(500)
   brief_introduction           String?   @db.Text
   status                       String    @default("Pending") @db.VarChar(20)
   reviewed_by                  String?   @db.VarChar(36)

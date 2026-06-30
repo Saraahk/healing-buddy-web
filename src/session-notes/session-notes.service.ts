@@ -31,6 +31,25 @@ export class SessionNotesService {
     });
   }
 
+  findByPatient(patientId: string) {
+    return this.prisma.sessionNote.findMany({
+      where: { patient_id: patientId },
+      include: { appointment: { select: { type: true, appointment_date: true } } },
+      orderBy: { created_at: 'desc' },
+    });
+  }
+
+  findByDoctor(doctorId: string) {
+    return this.prisma.sessionNote.findMany({
+      where: { doctor_id: doctorId },
+      include: {
+        patient: { include: { user: { select: { full_name: true, avatar_url: true } } } },
+        appointment: { select: { appointment_date: true, type: true } },
+      },
+      orderBy: { created_at: 'desc' },
+    });
+  }
+
   async findOne(id: string) {
     const note = await this.prisma.sessionNote.findUnique({
       where: { id },

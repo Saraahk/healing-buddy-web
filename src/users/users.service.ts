@@ -12,4 +12,8 @@ export class UsersService {
   findAll() {
     return this.prisma.user.findMany();
   }
+
+  updateAvatar(id: string, avatarUrl: string) {
+    return this.prisma.user.update({ where: { id }, data: { avatar_url: avatarUrl } });
+  }
 }

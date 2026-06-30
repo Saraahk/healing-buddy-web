@@ -33,6 +33,74 @@ export class AppointmentsService {
     });
   }
 
+  findByDoctor(doctorId: string) {
+    return this.prisma.appointment.findMany({
+      where: { doctor_id: doctorId },
+      include: { patient: { include: { user: { select: { full_name: true } } } } },
+      orderBy: { appointment_date: 'asc' },
+    });
+  }
+
+  findTodayByDoctor(doctorId: string) {
+    const start = new Date(); start.setHours(0, 0, 0, 0);
+    const end   = new Date(); end.setHours(23, 59, 59, 999);
+    return this.prisma.appointment.findMany({
+      where: { doctor_id: doctorId, appointment_date: { gte: start, lte: end } },
+      include: { patient: { include: { user: { select: { full_name: true } } } } },
+      orderBy: { appointment_date: 'asc' },
+    });
+  }
+
+  findTomorrowByDoctor(doctorId: string) {
+    const start = new Date(); start.setDate(start.getDate() + 1); start.setHours(0, 0, 0, 0);
+    const end   = new Date(); end.setDate(end.getDate() + 1);     end.setHours(23, 59, 59, 999);
+    return this.prisma.appointment.findMany({
+      where: { doctor_id: doctorId, appointment_date: { gte: start, lte: end } },
+      include: { patient: { include: { user: { select: { full_name: true } } } } },
+      orderBy: { appointment_date: 'asc' },
+    });
+  }
+
+  findUpcomingByDoctor(doctorId: string) {
+    const now = new Date();
+    return this.prisma.appointment.findMany({
+      where: { doctor_id: doctorId, appointment_date: { gt: now } },
+      include: { patient: { include: { user: { select: { full_name: true, avatar_url: true } } } } },
+      orderBy: { appointment_date: 'asc' },
+    });
+  }
+
+  findPreviousByDoctor(doctorId: string) {
+    const start = new Date(); start.setHours(0, 0, 0, 0);
+    return this.prisma.appointment.findMany({
+      where: { doctor_id: doctorId, appointment_date: { lt: start } },
+      include: { patient: { include: { user: { select: { full_name: true, avatar_url: true } } } } },
+      orderBy: { appointment_date: 'desc' },
+      take: 20,
+    });
+  }
+
+  findUpcomingByPatient(patientId: string) {
+    const now = new Date();
+    return this.prisma.appointment.findMany({
+      where: { patient_id: patientId, appointment_date: { gt: now } },
+      orderBy: { appointment_date: 'asc' },
+    });
+  }
+
+  findPastByPatient(patientId: string) {
+    const now = new Date();
+    return this.prisma.appointment.findMany({
+      where: { patient_id: patientId, appointment_date: { lt: now } },
+      orderBy: { appointment_date: 'desc' },
+      take: 20,
+    });
+  }
+
+  countPatientsByDoctor(doctorId: string) {
+    return this.prisma.doctorPatientAssignment.count({ where: { doctor_id: doctorId } });
+  }
+
   async findOne(id: string) {
     const appointment = await this.prisma.appointment.findUnique({
       where: { id },

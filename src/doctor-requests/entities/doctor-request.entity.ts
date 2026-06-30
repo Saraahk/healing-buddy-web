@@ -10,6 +10,7 @@ export class DoctorRequestEntity implements DoctorRequest {
   medical_license_no: string;
   cv_document_path: string | null;
   medical_degree_document_path: string | null;
+  avatar_url: string | null;
   brief_introduction: string | null;
   status: string;
   reviewed_by: string | null;

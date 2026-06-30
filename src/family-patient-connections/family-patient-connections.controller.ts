@@ -15,6 +15,11 @@ export class FamilyPatientConnectionsController {
     return this.service.findAll();
   }
 
+  @Get('patient/:patientId')
+  findByPatient(@Param('patientId') patientId: string) {
+    return this.service.findByPatient(patientId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.service.findOne(id);
