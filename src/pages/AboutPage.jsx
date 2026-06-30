@@ -61,6 +61,14 @@ const features = [
   },
 ]
 
+const doctors = [
+  { name: 'Dr. Sarah Mitchell',   specialty: 'Cardiologist',        rating: 4.9, img: 'https://randomuser.me/api/portraits/women/44.jpg' },
+  { name: 'Dr. James Carter',     specialty: 'Neurologist',          rating: 4.8, img: 'https://randomuser.me/api/portraits/men/32.jpg'   },
+  { name: 'Dr. Layla Hassan',     specialty: 'Internal Medicine',    rating: 4.7, img: 'https://randomuser.me/api/portraits/women/68.jpg' },
+  { name: 'Dr. Omar Al-Farsi',    specialty: 'Pulmonologist',        rating: 4.9, img: 'https://randomuser.me/api/portraits/men/75.jpg'   },
+  { name: 'Dr. Emily Nguyen',     specialty: 'Endocrinologist',      rating: 4.6, img: 'https://randomuser.me/api/portraits/women/21.jpg' },
+]
+
 const steps = [
   { num: '01', title: 'Admin Approves', desc: 'The clinic admin reviews and approves the doctor\'s account, then sends credentials via email.' },
   { num: '02', title: 'Doctor Signs In', desc: 'Using the provided Doctor ID and password, the doctor securely logs in to the portal.' },
@@ -95,7 +103,7 @@ export default function AboutPage() {
           helping them follow their healing journey, stay connected with their support network,
           and access the tools they need to improve their health and quality of life.
         </p>
-        <button className="about__cta-btn" onClick={() => window.location.href = '/signup'}>
+        <button className="about__cta-btn" onClick={() => window.location.href = '/apply'}>
           Get Started
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
@@ -171,6 +179,27 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Doctors */}
+      <section className="about__doctors">
+        <span className="about__section-tag">OUR DOCTORS</span>
+        <h2 className="about__section-title">Trusted by top specialists</h2>
+        <div className="about__doctors-grid">
+          {doctors.map((d, i) => (
+            <div key={i} className="about__doctor-card">
+              <img src={d.img} alt={d.name} className="about__doctor-avatar" />
+              <span className="about__doctor-name">{d.name}</span>
+              <span className="about__doctor-specialty">{d.specialty}</span>
+              <div className="about__doctor-stars">
+                {'★★★★★'.split('').map((star, si) => (
+                  <span key={si} style={{ color: si < Math.round(d.rating) ? '#f59e0b' : '#e5e7eb', fontSize: 16 }}>{star}</span>
+                ))}
+                <span className="about__doctor-rating">{d.rating}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* CTA banner */}
       <section className="about__banner">
         <div className="about__banner-inner">
@@ -178,7 +207,7 @@ export default function AboutPage() {
           <p className="about__banner-sub">Request access from your administrator and start delivering better care today.</p>
           <div className="about__banner-actions">
             <button className="about__banner-btn about__banner-btn--primary" onClick={() => window.location.href = '/signup'}>Sign In</button>
-            <button className="about__banner-btn about__banner-btn--outline" onClick={() => window.location.href = '/contact-admin'}>Request Access</button>
+            <button className="about__banner-btn about__banner-btn--outline" onClick={() => window.location.href = '/apply'}>Request Access</button>
           </div>
         </div>
       </section>

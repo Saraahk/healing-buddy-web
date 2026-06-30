@@ -1,16 +1,31 @@
 import { useState } from 'react'
 import './SessionNoteModal.css'
 
+const BASE_URL = 'http://localhost:3000'
+
 export default function SessionNoteModal({ contact, onSave, onSkip }) {
   const [note, setNote] = useState('')
   const [type, setType] = useState('Appointment')
+  const [saving, setSaving] = useState(false)
 
-  function handleSave() {
-    const now = new Date()
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    const date = `${String(now.getDate()).padStart(2,'0')}.${months[now.getMonth()]}.${now.getFullYear()}`
-    const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
-    onSave({ date, time, type, note: note.trim() || '—' })
+  async function handleSave() {
+    if (!note.trim()) { onSkip(); return }
+
+    const doctor = JSON.parse(sessionStorage.getItem('doctorUser') ?? '{}')
+    setSaving(true)
+    try {
+      await fetch(`${BASE_URL}/session-notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          doctor_id: doctor.doctor_id,
+          patient_id: contact.id,
+          note_content: note.trim(),
+        }),
+      })
+    } catch {}
+    setSaving(false)
+    onSave()
   }
 
   return (
@@ -44,7 +59,7 @@ export default function SessionNoteModal({ contact, onSave, onSkip }) {
 
         <div className="snm__actions">
           <button className="snm__skip" onClick={onSkip}>Skip</button>
-          <button className="snm__save" onClick={handleSave}>Save Note</button>
+          <button className="snm__save" onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Note'}</button>
         </div>
       </div>
     </div>

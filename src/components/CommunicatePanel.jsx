@@ -1,35 +1,43 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './CommunicatePanel.css'
 import ChatPage from './ChatPage'
 import VoiceCallPage from './VoiceCallPage'
 import VideoCallPage from './VideoCallPage'
 import SessionNoteModal from './SessionNoteModal'
+import BASE_URL from '../api'
 
-const mockPatients = [
-  { id: '021231', name: 'El Said El Said',   illness: 'Cancer',         stage: 'Early',    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',    color: '#c7d2fe', unread: true  },
-  { id: '021232', name: 'Sara Ahmed',         illness: 'Diabetes',       stage: 'Moderate', avatar: 'https://randomuser.me/api/portraits/women/21.jpg',  color: '#bbf7d0', unread: false },
-  { id: '021233', name: 'Marcus Thorne',      illness: 'Heart Disease',  stage: 'Advanced', avatar: 'https://randomuser.me/api/portraits/men/45.jpg',    color: '#fde68a', unread: true  },
-  { id: '021234', name: 'Lara Croft',         illness: 'Kidney Disease', stage: 'Early',    avatar: 'https://randomuser.me/api/portraits/women/68.jpg',  color: '#fca5a5', unread: false },
-  { id: '021235', name: 'Omar Khalid',        illness: 'Liver Disease',  stage: 'Moderate', avatar: 'https://randomuser.me/api/portraits/men/11.jpg',    color: '#a5f3fc', unread: true  },
-  { id: '021236', name: 'Nora Hassan',        illness: 'Hypertension',   stage: 'Early',    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',  color: '#d8b4fe', unread: false },
-  { id: '021237', name: 'Ahmed Al-Rashid',    illness: 'Cancer',         stage: 'Advanced', avatar: 'https://randomuser.me/api/portraits/men/76.jpg',    color: '#fed7aa', unread: false },
-  { id: '021238', name: 'Fatima Al-Zahra',    illness: 'Diabetes',       stage: 'Moderate', avatar: 'https://randomuser.me/api/portraits/women/55.jpg',  color: '#bbf7d0', unread: true  },
-  { id: '021239', name: 'John Doe',           illness: 'Heart Disease',  stage: 'Advanced', avatar: 'https://randomuser.me/api/portraits/men/60.jpg',    color: '#c7d2fe', unread: false },
-  { id: '021240', name: 'Elena Miller',       illness: 'Arthritis',      stage: 'Early',    avatar: 'https://randomuser.me/api/portraits/women/33.jpg',  color: '#fde68a', unread: false },
-  { id: '021241', name: 'Khalid Al-Mansoori', illness: 'Kidney Disease', stage: 'Moderate', avatar: 'https://randomuser.me/api/portraits/men/22.jpg',    color: '#fca5a5', unread: true  },
-  { id: '021242', name: 'Mia Johnson',        illness: 'Hypertension',   stage: 'Early',    avatar: 'https://randomuser.me/api/portraits/women/12.jpg',  color: '#a5f3fc', unread: false },
-  { id: '021243', name: 'Rami Nassar',        illness: 'Liver Disease',  stage: 'Advanced', avatar: 'https://randomuser.me/api/portraits/men/88.jpg',    color: '#d8b4fe', unread: true  },
-]
-
+const COLORS = ['#c7d2fe','#bbf7d0','#fde68a','#fca5a5','#a5f3fc','#d8b4fe','#fed7aa']
 const PAGE_SIZE = 10
 
 export default function CommunicatePanel({ onViewChange }) {
+  const [patients, setPatients] = useState([])
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [chatPatient, setChatPatient] = useState(null)
   const [voicePatient, setVoicePatient] = useState(null)
   const [videoPatient, setVideoPatient] = useState(null)
   const [pendingContact, setPendingContact] = useState(null)
+
+  const doctorId = JSON.parse(sessionStorage.getItem('doctorUser') ?? '{}').doctor_id
+
+  useEffect(() => {
+    if (!doctorId) return
+    fetch(`${BASE_URL}/patients/doctor/${doctorId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (!Array.isArray(data)) return
+        setPatients(data.map((p, i) => ({
+          id: p.id,
+          name: p.user?.full_name ?? 'Unknown',
+          illness: p.primary_condition ?? '—',
+          stage: p.severity ?? 'Unknown',
+          avatar: p.user?.avatar_url ? BASE_URL + p.user.avatar_url : null,
+          color: COLORS[i % COLORS.length],
+          unread: false,
+        })))
+      })
+      .catch(() => {})
+  }, [doctorId])
 
   function openChat(patient)  { setChatPatient(patient);  onViewChange?.('chat') }
   function openVoice(patient) { setVoicePatient(patient); onViewChange?.('call') }
@@ -45,7 +53,7 @@ export default function CommunicatePanel({ onViewChange }) {
   if (voicePatient) return <VoiceCallPage patient={voicePatient} onEnd={() => handleSessionEnd(voicePatient)} />
   if (videoPatient) return <VideoCallPage patient={videoPatient} onEnd={() => handleSessionEnd(videoPatient)} />
 
-  const filtered = mockPatients.filter(
+  const filtered = patients.filter(
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.id.includes(search)

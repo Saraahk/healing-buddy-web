@@ -1,108 +1,62 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './SessionsPanel.css'
+import BASE_URL from '../api'
 
-const monthIdx = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 }
-function parseDate(str) {
-  const [d, m, y] = str.split('.')
-  return new Date(+y, monthIdx[m], +d)
+function getInitials(name = '') {
+  return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('')
 }
 
-const allSessions = [
-  {
-    id: 1,
-    patient: { id: '021231', name: 'El Said El Said', illness: 'Cancer', stage: 'Early', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    date: '10.Apr.2026', time: '10:00', type: 'Appointment',
-    note: 'Patient shows early signs of leukemia. Started chemotherapy protocol. Responding well so far.',
-  },
-  {
-    id: 2,
-    patient: { id: '021231', name: 'El Said El Said', illness: 'Cancer', stage: 'Early', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    date: '02.May.2026', time: '09:00', type: 'Review',
-    note: 'Blood count improved. Continue current treatment. Schedule next follow-up in 4 weeks.',
-  },
-  {
-    id: 3,
-    patient: { id: '021232', name: 'Sara Ahmed', illness: 'Diabetes', stage: 'Moderate', avatar: 'https://randomuser.me/api/portraits/women/21.jpg' },
-    date: '15.Mar.2026', time: '11:00', type: 'Appointment',
-    note: 'HbA1c at 8.2%. Adjusted insulin dosage. Patient advised on diet modifications.',
-  },
-  {
-    id: 4,
-    patient: { id: '021233', name: 'Marcus Thorne', illness: 'Heart Disease', stage: 'Advanced', avatar: 'https://randomuser.me/api/portraits/men/45.jpg' },
-    date: '20.Apr.2026', time: '09:00', type: 'Review',
-    note: 'ECG shows mild arrhythmia. Prescribed beta-blockers. Follow strict low-sodium diet.',
-  },
-  {
-    id: 5,
-    patient: { id: '021234', name: 'Lara Croft', illness: 'Kidney Disease', stage: 'Early', avatar: 'https://randomuser.me/api/portraits/women/68.jpg' },
-    date: '18.Apr.2026', time: '14:00', type: 'Appointment',
-    note: 'Creatinine levels elevated. Increased fluid intake recommended. Referred to nephrologist.',
-  },
-  {
-    id: 6,
-    patient: { id: '021235', name: 'Omar Khalid', illness: 'Liver Disease', stage: 'Moderate', avatar: 'https://randomuser.me/api/portraits/men/11.jpg' },
-    date: '25.Apr.2026', time: '08:30', type: 'Review',
-    note: 'ALT and AST slightly elevated. Antiviral treatment ongoing. Avoid alcohol completely.',
-  },
-  {
-    id: 7,
-    patient: { id: '021236', name: 'Nora Hassan', illness: 'Hypertension', stage: 'Early', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
-    date: '12.Apr.2026', time: '10:30', type: 'Appointment',
-    note: 'Blood pressure 145/90. Started low-dose antihypertensive. Lifestyle modifications advised.',
-  },
-  {
-    id: 8,
-    patient: { id: '021237', name: 'Ahmed Al-Rashid', illness: 'Cancer', stage: 'Advanced', avatar: 'https://randomuser.me/api/portraits/men/76.jpg' },
-    date: '05.May.2026', time: '08:00', type: 'Review',
-    note: 'Tumor markers declining. Immunotherapy session 4 completed. Patient tolerating well.',
-  },
-  {
-    id: 9,
-    patient: { id: '021238', name: 'Fatima Al-Zahra', illness: 'Diabetes', stage: 'Moderate', avatar: 'https://randomuser.me/api/portraits/women/55.jpg' },
-    date: '28.Apr.2026', time: '13:00', type: 'Appointment',
-    note: 'Fasting glucose 7.4 mmol/L. Adjusted metformin dose. Nutrition plan updated.',
-  },
-  {
-    id: 10,
-    patient: { id: '021239', name: 'John Doe', illness: 'Heart Disease', stage: 'Advanced', avatar: 'https://randomuser.me/api/portraits/men/60.jpg' },
-    date: '22.Apr.2026', time: '11:00', type: 'Review',
-    note: 'Post-stent check. Ejection fraction stable at 45%. Continue dual antiplatelet therapy.',
-  },
-].sort((a, b) => parseDate(b.date) - parseDate(a.date))
+function fmtDate(iso) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '.')
+}
+
+function fmtTime(iso) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+}
+
+function inPeriod(isoStr, filter) {
+  if (filter === 'All Time') return true
+  const d   = new Date(isoStr)
+  const now = new Date()
+  if (filter === 'This Week')      { const w = new Date(now); w.setDate(now.getDate() - 7); return d >= w }
+  if (filter === 'This Month')     { return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() }
+  if (filter === 'Last 3 Months')  { const m = new Date(now); m.setMonth(now.getMonth() - 3); return d >= m }
+  return true
+}
 
 export default function SessionsPanel() {
-  const [search, setSearch]           = useState('')
-  const [typeFilter, setTypeFilter]   = useState('All')
+  const [sessions, setSessions]         = useState([])
+  const [loading, setLoading]           = useState(true)
+  const [search, setSearch]             = useState('')
+  const [typeFilter, setTypeFilter]     = useState('All')
   const [periodFilter, setPeriodFilter] = useState('All Time')
 
-  const now = new Date()
+  const doctorId = JSON.parse(sessionStorage.getItem('doctorUser') ?? '{}').doctor_id
 
-  function inPeriod(dateStr) {
-    const d = parseDate(dateStr)
-    if (periodFilter === 'All Time') return true
-    if (periodFilter === 'This Week') {
-      const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7)
-      return d >= weekAgo
-    }
-    if (periodFilter === 'This Month') {
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-    }
-    if (periodFilter === 'Last 3 Months') {
-      const threeMonthsAgo = new Date(now); threeMonthsAgo.setMonth(now.getMonth() - 3)
-      return d >= threeMonthsAgo
-    }
-    return true
-  }
+  useEffect(() => {
+    if (!doctorId) { setLoading(false); return }
+    fetch(`${BASE_URL}/session-notes/doctor/${doctorId}`)
+      .then(r => r.json())
+      .then(data => setSessions(Array.isArray(data) ? data : []))
+      .catch(() => setSessions([]))
+      .finally(() => setLoading(false))
+  }, [doctorId])
 
-  const filtered = allSessions.filter(s => {
-    const matchSearch = s.patient.name.toLowerCase().includes(search.toLowerCase()) ||
-                        s.patient.illness.toLowerCase().includes(search.toLowerCase())
-    const matchType   = typeFilter === 'All' || s.type === typeFilter
-    return matchSearch && matchType && inPeriod(s.date)
+  const dateOf = s => s.appointment?.appointment_date ?? s.created_at
+
+  const filtered = sessions.filter(s => {
+    const name     = s.patient?.user?.full_name ?? ''
+    const matchSearch = name.toLowerCase().includes(search.toLowerCase())
+    const apptType = s.appointment?.type ?? 'Session'
+    const matchType   = typeFilter === 'All' || apptType === typeFilter
+    return matchSearch && matchType && inPeriod(dateOf(s), periodFilter)
   })
 
-  const totalAppointments = allSessions.filter(s => s.type === 'Appointment').length
-  const totalReviews      = allSessions.filter(s => s.type === 'Review').length
+  const totalSessions      = sessions.length
+  const totalAppointments  = sessions.filter(s => s.appointment?.type === 'Appointment').length
+  const totalReviews       = sessions.filter(s => s.appointment?.type === 'Review').length
 
   return (
     <div className="sess">
@@ -110,7 +64,7 @@ export default function SessionsPanel() {
       {/* Stats */}
       <div className="sess__stats">
         <div className="sess__stat">
-          <span className="sess__stat-value">{allSessions.length}</span>
+          <span className="sess__stat-value">{totalSessions}</span>
           <span className="sess__stat-label">Total Sessions</span>
           <div className="sess__stat-bar sess__stat-bar--all" />
         </div>
@@ -126,7 +80,6 @@ export default function SessionsPanel() {
         </div>
       </div>
 
-      {/* Main card */}
       <div className="sess__card">
 
         {/* Filters */}
@@ -137,7 +90,7 @@ export default function SessionsPanel() {
             </svg>
             <input
               className="sess__search-input"
-              placeholder="Search by patient or illness..."
+              placeholder="Search by patient..."
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -146,25 +99,13 @@ export default function SessionsPanel() {
           <div className="sess__filters-right">
             <div className="sess__tabs sess__tabs--period">
               {['All Time', 'This Week', 'This Month', 'Last 3 Months'].map(p => (
-                <button
-                  key={p}
-                  className={`sess__tab ${periodFilter === p ? 'sess__tab--active' : ''}`}
-                  onClick={() => setPeriodFilter(p)}
-                >
-                  {p}
-                </button>
+                <button key={p} className={`sess__tab ${periodFilter === p ? 'sess__tab--active' : ''}`} onClick={() => setPeriodFilter(p)}>{p}</button>
               ))}
             </div>
             <div className="sess__divider" />
             <div className="sess__tabs">
               {['All', 'Appointment', 'Review'].map(t => (
-                <button
-                  key={t}
-                  className={`sess__tab ${typeFilter === t ? 'sess__tab--active' : ''}`}
-                  onClick={() => setTypeFilter(t)}
-                >
-                  {t}
-                </button>
+                <button key={t} className={`sess__tab ${typeFilter === t ? 'sess__tab--active' : ''}`} onClick={() => setTypeFilter(t)}>{t}</button>
               ))}
             </div>
           </div>
@@ -179,40 +120,45 @@ export default function SessionsPanel() {
                 <th>DATE</th>
                 <th>TIME</th>
                 <th>TYPE</th>
-                <th>DOCTOR'S NOTE</th>
+                <th>SESSION NOTE</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="sess__empty">No sessions found</td>
-                </tr>
-              ) : filtered.map(s => (
-                <tr key={s.id}>
-                  <td>
-                    <div className="sess__patient">
-                      <img src={s.patient.avatar} alt={s.patient.name} className="sess__avatar" />
-                      <div className="sess__patient-info">
-                        <span className="sess__patient-name">{s.patient.name}</span>
-                        <span className="sess__patient-sub">
-                          {s.patient.illness}
-                          <span className={`sess__stage sess__stage--${s.patient.stage.toLowerCase()}`}>
-                            {s.patient.stage}
-                          </span>
-                        </span>
+              {loading ? (
+                <tr><td colSpan={5} className="sess__empty">Loading…</td></tr>
+              ) : filtered.length === 0 ? (
+                <tr><td colSpan={5} className="sess__empty">No sessions found</td></tr>
+              ) : filtered.map(s => {
+                const name     = s.patient?.user?.full_name ?? 'Unknown'
+                const avatarUrl = s.patient?.user?.avatar_url ?? null
+                const apptDate = dateOf(s)
+                const apptType = s.appointment?.type ?? 'Session'
+
+                return (
+                  <tr key={s.id}>
+                    <td>
+                      <div className="sess__patient">
+                        {avatarUrl ? (
+                          <img src={`${BASE_URL}${avatarUrl}`} alt={name} className="sess__avatar" />
+                        ) : (
+                          <div className="sess__avatar sess__avatar--initials">{getInitials(name)}</div>
+                        )}
+                        <div className="sess__patient-info">
+                          <span className="sess__patient-name">{name}</span>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td><span className="sess__date">{s.date}</span></td>
-                  <td className="sess__time">{s.time}</td>
-                  <td>
-                    <span className={`sess__badge sess__badge--${s.type === 'Appointment' ? 'appt' : 'review'}`}>
-                      {s.type}
-                    </span>
-                  </td>
-                  <td><span className="sess__note">{s.note}</span></td>
-                </tr>
-              ))}
+                    </td>
+                    <td><span className="sess__date">{fmtDate(apptDate)}</span></td>
+                    <td className="sess__time">{fmtTime(apptDate)}</td>
+                    <td>
+                      <span className={`sess__badge sess__badge--${apptType === 'Appointment' ? 'appt' : 'review'}`}>
+                        {apptType}
+                      </span>
+                    </td>
+                    <td><span className="sess__note">{s.note_content}</span></td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

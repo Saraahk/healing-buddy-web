@@ -1,54 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './AdminApprovalsPanel.css'
+import BASE_URL from '../../api'
 
-const DOCTOR_REQUESTS = [
-  {
-    id: 1,
-    name: 'Dr. Omar Al-Rashid',
-    email: 'omar.rashid@email.com',
-    phone: '+966 50 123 4567',
-    specialty: 'Therapy',
-    licenseNumber: 'MD-447821',
-    yearsExp: 8,
-    date: '2 days ago',
-    bio: 'Referred by Dr. Khalid Hassan. Experienced therapist with a focus on CBT and trauma-informed care.',
-    cv: 'Omar_AlRashid_CV.pdf',
-    degree: 'MedDegree_Omar.pdf',
-  },
-  {
-    id: 2,
-    name: 'Dr. Nora Khalil',
-    email: 'nora.khalil@email.com',
-    phone: '+966 55 987 6543',
-    specialty: 'Chronic Diseases',
-    licenseNumber: 'MD-339012',
-    yearsExp: 12,
-    date: '3 days ago',
-    bio: 'Previously at Al-Noor Clinic. Specialized in managing diabetes and hypertension in chronic patients.',
-    cv: 'Nora_Khalil_CV.pdf',
-    degree: null,
-  },
-  {
-    id: 3,
-    name: 'Dr. Rami Suleiman',
-    email: 'rami.sul@email.com',
-    phone: '+966 54 321 0000',
-    specialty: 'General Doctor',
-    licenseNumber: 'MD-201988',
-    yearsExp: 5,
-    date: '5 days ago',
-    bio: '',
-    cv: null,
-    degree: 'RamiSuleiman_Degree.jpg',
-  },
-]
+const BUDDY_REQUESTS = []
 
-const BUDDY_REQUESTS = [
-  { id:1, name:'Yusuf Al-Said',  email:'yusuf.said@email.com',  patient:'Ahmed Salim',     relation:'Friend',   date:'1 day ago',  note:'Patient Ahmed has approved this request' },
-  { id:2, name:'Layla Mansour',  email:'layla.m@email.com',     patient:'Fatima Al-Yusuf', relation:'Neighbor', date:'3 days ago', note:'' },
-  { id:3, name:'Mona Al-Rashid', email:'mona.r@email.com',      patient:'Salma Nasser',    relation:'Cousin',   date:'4 days ago', note:'Family friend, approved by patient' },
-  { id:4, name:'Khaled Ibrahim', email:'khaled.i@email.com',    patient:'Rania Al-Farsi',  relation:'Friend',   date:'1 week ago', note:'' },
-]
+function mapRequest(r) {
+  return {
+    id:            r.id,
+    name:          r.full_name,
+    email:         r.email,
+    phone:         r.phone_number,
+    specialty:     r.medical_specialty,
+    licenseNumber: r.medical_license_no,
+    yearsExp:      r.years_of_experience,
+    date:          new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    bio:           r.brief_introduction ?? '',
+    cv:            r.cv_document_path ?? null,
+    degree:        r.medical_degree_document_path ?? null,
+    avatar_url:    r.avatar_url ?? null,
+  }
+}
 
 function ini(name) {
   return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('')
@@ -73,7 +44,11 @@ function DocDetailDrawer({ doc, onClose, onApprove, onReject }) {
       <div className="aa-drawer" onClick={e => e.stopPropagation()}>
 
         <div className="aa-drawer__header">
-          <div className="aa-drawer__avatar">{ini(doc.name)}</div>
+          {doc.avatar_url ? (
+            <img src={`${BASE_URL}${doc.avatar_url}`} alt={doc.name} className="aa-drawer__avatar aa-drawer__avatar--img" />
+          ) : (
+            <div className="aa-drawer__avatar">{ini(doc.name)}</div>
+          )}
           <div>
             <h3 className="aa-drawer__name">{doc.name}</h3>
             <p className="aa-drawer__email">{doc.email}</p>
@@ -162,7 +137,11 @@ function DoctorList({ items, onShowInfo, processed }) {
       {items.map(r => (
         <div key={r.id} className="aa-card">
           <div className="aa-card__left">
-            <div className="aa-avatar">{ini(r.name)}</div>
+            {r.avatar_url ? (
+              <img src={`${BASE_URL}${r.avatar_url}`} alt={r.name} className="aa-avatar aa-avatar--img" />
+            ) : (
+              <div className="aa-avatar">{ini(r.name)}</div>
+            )}
             <div className="aa-info">
               <p className="aa-name">{r.name}</p>
               <p className="aa-email">{r.email}</p>
@@ -271,21 +250,101 @@ function BuddyList({ items, onApprove, onReject, processed }) {
   )
 }
 
-export default function AdminApprovalsPanel({ onCountChange }) {
-  const [tab, setTab]         = useState('doctors')
-  const [docReqs, setDocReqs] = useState(DOCTOR_REQUESTS)
-  const [budReqs, setBudReqs] = useState(BUDDY_REQUESTS)
-  const [docDone, setDocDone] = useState([])
-  const [budDone, setBudDone] = useState([])
-  const [selected, setSelected] = useState(null)
+function CredentialsModal({ email, password, onClose }) {
+  const [copied, setCopied] = useState(false)
 
-  function act(type, id, result) {
+  function copy() {
+    navigator.clipboard.writeText(`Email: ${email}\nPassword: ${password}`)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="aa-overlay aa-overlay--center" onClick={onClose}>
+      <div className="aa-modal-creds" onClick={e => e.stopPropagation()}>
+        <div className="aa-modal-creds__icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h3 className="aa-modal-creds__title">Doctor Approved!</h3>
+        <p className="aa-modal-creds__sub">Share these credentials with the doctor to log in:</p>
+
+        <div className="aa-modal-creds__box">
+          <div className="aa-modal-creds__row">
+            <span className="aa-modal-creds__label">Email</span>
+            <span className="aa-modal-creds__value">{email}</span>
+          </div>
+          <div className="aa-modal-creds__divider" />
+          <div className="aa-modal-creds__row">
+            <span className="aa-modal-creds__label">Temp Password</span>
+            <span className="aa-modal-creds__value aa-modal-creds__value--pass">{password}</span>
+          </div>
+        </div>
+
+        <div className="aa-modal-creds__actions">
+          <button className="aa-modal-creds__copy" onClick={copy}>
+            {copied ? '✓ Copied!' : 'Copy Credentials'}
+          </button>
+          <button className="aa-modal-creds__close" onClick={onClose}>Done</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function AdminApprovalsPanel({ onCountChange }) {
+  const [tab, setTab]           = useState('doctors')
+  const [docReqs, setDocReqs]   = useState([])
+  const [budReqs, setBudReqs]   = useState(BUDDY_REQUESTS)
+  const [docDone, setDocDone]   = useState([])
+  const [budDone, setBudDone]   = useState([])
+  const [selected, setSelected] = useState(null)
+  const [creds, setCreds]       = useState(null)
+
+  useEffect(() => {
+    fetch(`${BASE_URL}/doctor-requests/status/Pending`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const mapped = data.map(mapRequest)
+          setDocReqs(mapped)
+          onCountChange?.(mapped.length + budReqs.length)
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  async function act(type, id, result) {
     if (type === 'doctor') {
+      const endpoint = result === 'approved' ? 'approve' : 'reject'
+      const adminId  = JSON.parse(sessionStorage.getItem('adminUser') ?? '{}')?.id ?? ''
       const item = docReqs.find(r => r.id === id)
-      const next = docReqs.filter(r => r.id !== id)
-      setDocReqs(next)
-      setDocDone(p => [...p, { ...item, result }])
-      onCountChange?.(next.length + budReqs.length)
+
+      try {
+        const res  = await fetch(`${BASE_URL}/doctor-requests/${id}/${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reviewer_id: adminId }),
+        })
+        const data = await res.json()
+
+        if (!res.ok) {
+          alert(`Error: ${data.message ?? 'Something went wrong'}`)
+          return
+        }
+
+        const next = docReqs.filter(r => r.id !== id)
+        setDocReqs(next)
+        setDocDone(p => [...p, { ...item, result }])
+        onCountChange?.(next.length + budReqs.length)
+
+        if (result === 'approved' && data.temp_password) {
+          setCreds({ email: item.email, password: data.temp_password })
+        }
+      } catch {
+        alert('Network error, please try again')
+      }
     } else {
       const item = budReqs.find(r => r.id === id)
       const next = budReqs.filter(r => r.id !== id)
@@ -340,6 +399,14 @@ export default function AdminApprovalsPanel({ onCountChange }) {
           onClose={() => setSelected(null)}
           onApprove={id => act('doctor', id, 'approved')}
           onReject={id  => act('doctor', id, 'rejected')}
+        />
+      )}
+
+      {creds && (
+        <CredentialsModal
+          email={creds.email}
+          password={creds.password}
+          onClose={() => setCreds(null)}
         />
       )}
     </div>

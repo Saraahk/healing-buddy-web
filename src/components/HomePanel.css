@@ -8,7 +8,7 @@
 /* ── Stats row ─────────────────────────────────── */
 .home__stats {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
@@ -16,11 +16,12 @@
   position: relative;
   background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px 20px 18px;
+  border-radius: 16px;
+  padding: 24px 22px 20px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  min-height: 140px;
 }
 
 .stat-card--emergency {
@@ -55,27 +56,27 @@
 }
 
 .stat-card__icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
   background: #DBE2CE;
   color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .stat-card__label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: var(--text-gray);
   text-transform: uppercase;
 }
 
 .stat-card__value {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   color: var(--text-dark);
   line-height: 1;

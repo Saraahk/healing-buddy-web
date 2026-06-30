@@ -125,6 +125,18 @@
   background: var(--primary-light);
 }
 
+.topbar__avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4a7c26;
+  background: #d4f0a0;
+  border: 2px solid #b8e07a;
+  flex-shrink: 0;
+}
+
 .topbar__user-info {
   display: flex;
   flex-direction: column;

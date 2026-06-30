@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { INITIAL_FAQS, INITIAL_QUICK_LINKS } from '../../data/helpContent'
 import './AdminContentPanel.css'
+import BASE_URL from '../../api'
 
 const AUDIENCE_OPTIONS = [
   { id: 'healing_buddy', label: 'Healing Buddy', color: '#6366f1', bg: '#ede9fe' },
@@ -9,13 +10,7 @@ const AUDIENCE_OPTIONS = [
   { id: 'patient',       label: 'Patient',         color: '#0891b2', bg: '#cffafe' },
 ]
 
-const INITIAL_ANNOUNCEMENTS = [
-  { id:1, title:'Platform Maintenance Notice',       body:'The platform will undergo scheduled maintenance on June 5th from 2:00 AM to 4:00 AM. Please save your work beforehand.', date:'May 28, 2025', status:'sent',  audience:['doctor','patient'] },
-  { id:2, title:'New Feature: Session Notes Export', body:'You can now export your session notes as PDF from the Sessions section. Look for the Export button in the top-right corner.',  date:'May 20, 2025', status:'sent',  audience:['doctor'] },
-  { id:3, title:'Reminder: Update Your Profile',     body:'Please ensure your profile information is up to date, especially your email address, so you can receive important notifications.', date:'Draft', status:'draft', audience:[] },
-]
-
-/* ── FAQ Tab ── */
+/* ── FAQ Tab (local only — no backend) ── */
 function FAQTab() {
   const [faqs, setFaqs]       = useState(INITIAL_FAQS)
   const [editId, setEditId]   = useState(null)
@@ -26,37 +21,19 @@ function FAQTab() {
   const [newA, setNewA]       = useState('')
   const [saved, setSaved]     = useState(false)
 
-  function startEdit(faq) {
-    setEditId(faq.id); setEditQ(faq.q); setEditA(faq.a)
-  }
+  function startEdit(faq) { setEditId(faq.id); setEditQ(faq.q); setEditA(faq.a) }
 
   function saveEdit() {
     setFaqs(prev => prev.map(f => f.id === editId ? { ...f, q: editQ, a: editA } : f))
-    setEditId(null)
-    flash()
+    setEditId(null); flash()
   }
 
-  function del(id) {
-    setFaqs(prev => prev.filter(f => f.id !== id))
-    flash()
-  }
+  function del(id) { setFaqs(prev => prev.filter(f => f.id !== id)); flash() }
 
   function addNew() {
     if (!newQ.trim() || !newA.trim()) return
     setFaqs(prev => [...prev, { id: Date.now(), q: newQ.trim(), a: newA.trim() }])
-    setNewQ(''); setNewA(''); setAdding(false)
-    flash()
-  }
-
-  function move(id, dir) {
-    setFaqs(prev => {
-      const idx = prev.findIndex(f => f.id === id)
-      const next = [...prev]
-      const swap = idx + dir
-      if (swap < 0 || swap >= next.length) return prev;
-      [next[idx], next[swap]] = [next[swap], next[idx]]
-      return next
-    })
+    setNewQ(''); setNewA(''); setAdding(false); flash()
   }
 
   function flash() { setSaved(true); setTimeout(() => setSaved(false), 2000) }
@@ -99,11 +76,7 @@ function FAQTab() {
             ) : (
               <>
                 <div className="ac-faq-body">
-                  <div className="ac-faq-order">
-                    <button className="ac-order-btn" onClick={() => move(f.id, -1)} disabled={i === 0}>▲</button>
-                    <span className="ac-faq-num">{i + 1}</span>
-                    <button className="ac-order-btn" onClick={() => move(f.id, 1)} disabled={i === faqs.length - 1}>▼</button>
-                  </div>
+                  <span className="ac-faq-num">{i + 1}</span>
                   <div className="ac-faq-content">
                     <p className="ac-faq-q">{f.q}</p>
                     <p className="ac-faq-a">{f.a}</p>
@@ -126,7 +99,7 @@ function FAQTab() {
   )
 }
 
-/* ── Quick Links Tab ── */
+/* ── Quick Links Tab (local only — no backend) ── */
 function QuickLinksTab() {
   const [links, setLinks]     = useState(INITIAL_QUICK_LINKS)
   const [editId, setEditId]   = useState(null)
@@ -136,14 +109,8 @@ function QuickLinksTab() {
   const [saved, setSaved]     = useState(false)
 
   function flash() { setSaved(true); setTimeout(() => setSaved(false), 2000) }
-
-  function saveEdit() {
-    setLinks(prev => prev.map(l => l.id === editId ? { ...l, label: editLabel } : l))
-    setEditId(null); flash()
-  }
-
+  function saveEdit() { setLinks(prev => prev.map(l => l.id === editId ? { ...l, label: editLabel } : l)); setEditId(null); flash() }
   function del(id) { setLinks(prev => prev.filter(l => l.id !== id)); flash() }
-
   function addNew() {
     if (!newLabel.trim()) return
     setLinks(prev => [...prev, { id: Date.now(), label: newLabel.trim() }])
@@ -206,41 +173,75 @@ function QuickLinksTab() {
   )
 }
 
-/* ── Announcements Tab ── */
+/* ── Announcements Tab (connected to backend) ── */
 function AnnouncementsTab() {
-  const [items, setItems]       = useState(INITIAL_ANNOUNCEMENTS)
-  const [adding, setAdding]     = useState(false)
-  const [newT, setNewT]         = useState('')
-  const [newB, setNewB]         = useState('')
-  const [newAud, setNewAud]     = useState([])
-  const [sent, setSent]         = useState(null)
-  const [audErr, setAudErr]     = useState(false)
+  const [items, setItems]   = useState([])
+  const [adding, setAdding] = useState(false)
+  const [newT, setNewT]     = useState('')
+  const [newB, setNewB]     = useState('')
+  const [newAud, setNewAud] = useState([])
+  const [sent, setSent]     = useState(null)
+  const [audErr, setAudErr] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  function toggleAud(id) {
-    setAudErr(false)
-    setNewAud(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id])
+  const adminId = JSON.parse(sessionStorage.getItem('adminUser') ?? '{}')?.id ?? ''
+
+  useEffect(() => {
+    fetch(`${BASE_URL}/announcement`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setItems(data.map(a => ({
+            id:       a.id,
+            title:    a.title,
+            body:     a.message,
+            status:   a.status === 'Sent' ? 'sent' : 'draft',
+            audience: Array.isArray(a.target_audience) ? a.target_audience : [],
+            date:     a.status === 'Sent' && a.sent_at
+                        ? new Date(a.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                        : 'Draft',
+          })))
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  function toggleAud(id) { setAudErr(false); setNewAud(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]) }
+
+  async function createAnnouncement(status) {
+    if (!newT.trim() || !newB.trim()) return
+    if (newAud.length === 0) { setAudErr(true); return }
+    const res = await fetch(`${BASE_URL}/announcement`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: newT.trim(), message: newB.trim(), target_audience: newAud, created_by: adminId, status }),
+    })
+    if (!res.ok) return
+    const created = await res.json()
+    const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    setItems(prev => [{
+      id:       created.id,
+      title:    created.title,
+      body:     created.message,
+      status:   created.status === 'Sent' ? 'sent' : 'draft',
+      audience: Array.isArray(created.target_audience) ? created.target_audience : newAud,
+      date:     status === 'Sent' ? now : 'Draft',
+    }, ...prev])
+    setNewT(''); setNewB(''); setNewAud([]); setAdding(false); setAudErr(false)
   }
 
-  function send(id) {
-    setItems(prev => prev.map(a => a.id === id ? { ...a, status: 'sent', date: 'Just now' } : a))
+  async function send(id) {
+    const res = await fetch(`${BASE_URL}/announcement/${id}/send`, { method: 'PATCH' })
+    if (!res.ok) return
+    const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    setItems(prev => prev.map(a => a.id === id ? { ...a, status: 'sent', date: now } : a))
     setSent(id); setTimeout(() => setSent(null), 2500)
   }
 
-  function del(id) { setItems(prev => prev.filter(a => a.id !== id)) }
-
-  function addDraft() {
-    if (!newT.trim() || !newB.trim()) return
-    if (newAud.length === 0) { setAudErr(true); return }
-    setItems(prev => [...prev, { id: Date.now(), title: newT.trim(), body: newB.trim(), date: 'Draft', status: 'draft', audience: newAud }])
-    setNewT(''); setNewB(''); setNewAud([]); setAdding(false); setAudErr(false)
-  }
-
-  function sendNow() {
-    if (!newT.trim() || !newB.trim()) return
-    if (newAud.length === 0) { setAudErr(true); return }
-    const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    setItems(prev => [...prev, { id: Date.now(), title: newT.trim(), body: newB.trim(), date: now, status: 'sent', audience: newAud }])
-    setNewT(''); setNewB(''); setNewAud([]); setAdding(false); setAudErr(false)
+  async function del(id) {
+    await fetch(`${BASE_URL}/announcement/${id}`, { method: 'DELETE' })
+    setItems(prev => prev.filter(a => a.id !== id))
   }
 
   function cancel() { setAdding(false); setNewT(''); setNewB(''); setNewAud([]); setAudErr(false) }
@@ -290,17 +291,18 @@ function AnnouncementsTab() {
           </div>
 
           <div className="ac-new-actions">
-            <button className="ac-btn ac-btn--send" onClick={sendNow}>
+            <button className="ac-btn ac-btn--send" onClick={() => createAnnouncement('Sent')}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               Send Now
             </button>
-            <button className="ac-btn ac-btn--draft" onClick={addDraft}>Save as Draft</button>
+            <button className="ac-btn ac-btn--draft" onClick={() => createAnnouncement('Draft')}>Save as Draft</button>
           </div>
         </div>
       )}
 
       <div className="ac-list">
-        {items.map(a => (
+        {loading && <div style={{ color: '#9ca3af', fontSize: 14, padding: '16px 0' }}>Loading...</div>}
+        {!loading && items.map(a => (
           <div key={a.id} className={`ac-ann-card ${a.status === 'draft' ? 'ac-ann-card--draft' : ''}`}>
             <div className="ac-ann-body">
               <div className="ac-ann-top">
@@ -315,9 +317,7 @@ function AnnouncementsTab() {
                   {a.audience.map(aid => {
                     const opt = AUDIENCE_OPTIONS.find(o => o.id === aid)
                     return opt ? (
-                      <span key={aid} className="ac-ann-tag" style={{ background: opt.bg, color: opt.color }}>
-                        {opt.label}
-                      </span>
+                      <span key={aid} className="ac-ann-tag" style={{ background: opt.bg, color: opt.color }}>{opt.label}</span>
                     ) : null
                   })}
                 </div>
@@ -336,6 +336,9 @@ function AnnouncementsTab() {
             </div>
           </div>
         ))}
+        {!loading && items.length === 0 && (
+          <div style={{ color: '#9ca3af', fontSize: 14, padding: '16px 0' }}>No announcements yet.</div>
+        )}
       </div>
     </div>
   )
@@ -345,7 +348,7 @@ function AnnouncementsTab() {
 const TABS = [
   { id: 'faq',           label: 'FAQ',           desc: 'Help Centre questions' },
   { id: 'quicklinks',    label: 'Quick Links',    desc: 'Help Centre shortcuts' },
-  { id: 'announcements', label: 'Announcements',  desc: 'Notify all doctors'    },
+  { id: 'announcements', label: 'Announcements',  desc: 'Notify all users'      },
 ]
 
 export default function AdminContentPanel() {

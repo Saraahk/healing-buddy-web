@@ -1,19 +1,19 @@
 import { useState } from 'react'
-import logo from '../assets/logo.png'
-import './SignUpPage.css'
-import BASE_URL from '../api'
+import logo from '../../assets/logo.png'
+import '../SignUpPage.css'
+import BASE_URL from '../../api'
 
-export default function SignInPage() {
-  const [email, setEmail]         = useState('')
-  const [password, setPassword]   = useState('')
-  const [showPass, setShowPass]   = useState(false)
-  const [errors, setErrors]       = useState({})
-  const [loading, setLoading]     = useState(false)
+export default function AdminLoginPage() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPass, setShowPass] = useState(false)
+  const [errors, setErrors]     = useState({})
+  const [loading, setLoading]   = useState(false)
 
   function validate() {
     const e = {}
-    if (!email.trim())  e.email    = 'Email is required'
-    if (!password)      e.password = 'Password is required'
+    if (!username.trim()) e.username = 'Username is required'
+    if (!password)        e.password = 'Password is required'
     return e
   }
 
@@ -23,20 +23,21 @@ export default function SignInPage() {
     if (Object.keys(e).length) { setErrors(e); return }
     setLoading(true)
     try {
-      const res = await fetch(`${BASE_URL}/auth/doctor/login`, {
+      const res = await fetch(`${BASE_URL}/auth/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: username, password }),
       })
       if (!res.ok) {
-        setErrors({ email: 'Invalid email or password' })
+        setErrors({ password: 'Invalid email or password' })
         return
       }
       const data = await res.json()
-      sessionStorage.setItem('doctorUser', JSON.stringify(data))
-      window.location.href = '/dashboard'
+      sessionStorage.setItem('adminAuth', '1')
+      sessionStorage.setItem('adminUser', JSON.stringify(data))
+      window.location.href = '/admin'
     } catch {
-      setErrors({ email: 'Server error, please try again' })
+      setErrors({ password: 'Server error, please try again' })
     } finally {
       setLoading(false)
     }
@@ -48,12 +49,10 @@ export default function SignInPage() {
       {/* Left panel */}
       <div className="signup__left">
 
-        {/* Floating particles */}
         <div className="sp sp--1" /><div className="sp sp--2" /><div className="sp sp--3" />
         <div className="sp sp--4" /><div className="sp sp--5" /><div className="sp sp--6" />
         <div className="sp sp--7" /><div className="sp sp--8" />
 
-        {/* Animated center visual */}
         <div className="signup__visual">
           <div className="signup__pulse signup__pulse--1" />
           <div className="signup__pulse signup__pulse--2" />
@@ -67,17 +66,17 @@ export default function SignInPage() {
         </div>
 
         <div className="signup__left-body">
-          <h1 className="signup__left-title">Welcome back,<br />Doctor.</h1>
+          <h1 className="signup__left-title">Welcome back,<br />Admin.</h1>
           <p className="signup__left-sub">
-            Your credentials were sent to your email by the admin after account approval. Use them to sign in.
+            Sign in to manage the platform, review doctor applications, and oversee all system activity.
           </p>
 
           <ul className="signup__features">
             {[
-              'Secure doctor portal',
-              'Real-time patient communication',
-              'Session history & notes',
-              'Smart appointment scheduling',
+              'Full platform control',
+              'Doctor application review',
+              'User & content management',
+              'Analytics & system overview',
             ].map((f, i) => (
               <li key={f} className="signup__feature" style={{ animationDelay: `${0.3 + i * 0.1}s` }}>
                 <span className="signup__feature-check">
@@ -98,29 +97,30 @@ export default function SignInPage() {
         <div className="signup__card">
 
           <div className="signup__card-header">
-            <span className="signup__badge">DOCTOR PORTAL</span>
+            <span className="signup__badge">ADMIN PORTAL</span>
             <h2 className="signup__title">Sign In</h2>
-            <p className="signup__subtitle">Use the credentials sent to your email</p>
+            <p className="signup__subtitle">Enter your admin credentials to continue</p>
           </div>
 
           <form className="signup__form" onSubmit={handleSubmit} noValidate>
 
-            {/* Email */}
+            {/* Username */}
             <div className="signup__field">
-              <label className="signup__label">Email</label>
-              <div className={`signup__input-wrap ${errors.email ? 'signup__input-wrap--error' : ''}`}>
+              <label className="signup__label">Username</label>
+              <div className={`signup__input-wrap ${errors.username ? 'signup__input-wrap--error' : ''}`}>
                 <svg className="signup__input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
                 </svg>
                 <input
                   className="signup__input"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={e => { setEmail(e.target.value); setErrors(er => ({ ...er, email: '' })) }}
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={e => { setUsername(e.target.value); setErrors(er => ({ ...er, username: '' })) }}
                 />
               </div>
-              {errors.email && <span className="signup__error">{errors.email}</span>}
+              {errors.username && <span className="signup__error">{errors.username}</span>}
             </div>
 
             {/* Password */}
@@ -159,11 +159,6 @@ export default function SignInPage() {
             <button type="submit" className="signup__btn" disabled={loading}>
               {loading ? 'Signing in…' : 'Sign In'}
             </button>
-
-            <p className="signup__hint">
-              Don't have credentials?{' '}
-              <span className="signup__hint-em" style={{ cursor: 'pointer' }} onClick={() => window.location.href = '/contact-admin'}>Contact your administrator.</span>
-            </p>
 
           </form>
 

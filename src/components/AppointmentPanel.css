@@ -70,6 +70,17 @@
   border: 2px solid var(--border);
 }
 
+.session-card__avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #4a7c26;
+  background: #d4f0a0;
+  flex-shrink: 0;
+}
+
 .session-card__name {
   font-size: 14px;
   font-weight: 600;
@@ -261,6 +272,17 @@
   border: 1.5px solid var(--border);
 }
 
+.appt__table-avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4a7c26;
+  background: #d4f0a0;
+  flex-shrink: 0;
+}
+
 .appt__date-cell {
   display: flex;
   align-items: center;
@@ -405,4 +427,47 @@
 .modal__btn--reject {
   background: #ef4444;
   color: #fff;
+}
+
+.modal__btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Reschedule fields */
+.reschedule__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  margin: 4px 0;
+}
+
+.reschedule__field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.reschedule__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dark);
+  text-align: left;
+}
+
+.reschedule__input {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.reschedule__input:focus { border-color: var(--primary); }
+
+.reschedule__error {
+  font-size: 12px;
+  color: #ef4444;
+  margin: 0;
 }

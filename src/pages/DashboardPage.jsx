@@ -32,9 +32,16 @@ const pageTitles = {
 }
 
 export default function DashboardPage() {
-  const [active, setActive]       = useState('home')
-  const [viewMode, setViewMode]   = useState(null)
-  const [emergency, setEmergency] = useState(null)
+  const [active, setActive]             = useState('home')
+  const [viewMode, setViewMode]         = useState(null)
+  const [emergency, setEmergency]       = useState(null)
+  const [pendingPatientId, setPendingPatientId] = useState(null)
+
+  function handleViewPatient(patientId) {
+    setPendingPatientId(patientId)
+    setActive('patients')
+    setViewMode(null)
+  }
 
   // Simulate emergency arriving after 4 seconds (demo only)
   useEffect(() => {
@@ -43,10 +50,10 @@ export default function DashboardPage() {
   }, [])
 
   const panels = {
-    home: <HomePanel />,
-    patients: <PatientsPanel onViewChange={setViewMode} />,
+    home:       <HomePanel onViewPatient={handleViewPatient} />,
+    patients:   <PatientsPanel onViewChange={setViewMode} initialPatientId={pendingPatientId} onPatientOpened={() => setPendingPatientId(null)} />,
     communicate: <CommunicatePanel onViewChange={setViewMode} />,
-    appointment: <AppointmentPanel />,
+    appointment: <AppointmentPanel onViewPatient={handleViewPatient} />,
     sessions:  <SessionsPanel />,
     settings:      <SettingsPanel />,
     help:          <HelpPanel />,

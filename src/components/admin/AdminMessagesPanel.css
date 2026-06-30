@@ -209,10 +209,60 @@
 }
 
 .admin-messages__view-subject {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-dark);
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+}
+
+/* Chat bubbles */
+.admin-messages__bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  max-width: 80%;
+}
+
+.admin-messages__bubble--in {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.admin-messages__bubble--out {
+  align-self: flex-end;
+  align-items: flex-end;
+  margin-left: auto;
+}
+
+.admin-messages__bubble-text {
+  font-size: 13.5px;
+  line-height: 1.65;
+  padding: 12px 16px;
+  border-radius: 14px;
+}
+
+.admin-messages__bubble--in .admin-messages__bubble-text {
+  background: #f3f4f6;
+  color: var(--text-dark);
+  border-bottom-left-radius: 4px;
+}
+
+.admin-messages__bubble--out .admin-messages__bubble-text {
+  background: var(--primary);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.admin-messages__bubble-time {
+  font-size: 11px;
+  color: #9ca3af;
+  padding: 0 4px;
+}
+
+.admin-messages__view-body {
+  display: flex;
+  flex-direction: column;
 }
 
 .admin-messages__view-text {
@@ -226,14 +276,233 @@
 }
 
 /* Compose */
-.admin-messages__view-compose {
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  padding: 14px 24px;
-  background: #fff;
+/* Gmail-style compose button */
+.admin-messages__list-footer {
+  padding: 12px 16px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
+}
+
+.admin-messages__gmail-compose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(90,128,21,0.35);
+  transition: opacity 0.12s, transform 0.12s;
+  margin-left: auto;
+}
+.admin-messages__gmail-compose:hover {
+  opacity: 0.88;
+  transform: scale(1.07);
+}
+
+/* Inline reply box */
+.admin-messages__reply-box {
+  border-top: 1px solid var(--border);
+  padding: 14px 24px;
+  background: #fff;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  margin: 0 24px 16px;
+  background: #f9fafb;
+  transition: border-color 0.15s;
+  overflow: hidden;
+}
+.admin-messages__reply-box:focus-within { border-color: var(--primary); background: #fff; }
+
+.admin-messages__reply-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--text-dark);
+  background: transparent;
+  resize: none;
+  padding: 12px 14px;
+  box-sizing: border-box;
+}
+.admin-messages__reply-input::placeholder { color: #9ca3af; }
+
+.admin-messages__reply-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0 8px 0 0;
+  transition: opacity 0.12s;
+}
+.admin-messages__reply-send:hover:not(:disabled) { opacity: 0.85; }
+.admin-messages__reply-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Footer with compose button */
+.admin-messages__view-footer {
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.admin-messages__compose-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.12s;
+}
+.admin-messages__compose-btn:hover { opacity: 0.88; }
+
+/* Compose page */
+.admin-messages__compose-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.admin-messages__compose-page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.admin-messages__back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-gray);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 7px;
+  transition: background 0.12s;
+}
+.admin-messages__back-btn:hover { background: #f3f4f6; color: var(--text-dark); }
+
+.admin-messages__compose-page-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.admin-messages__compose-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+}
+
+.admin-messages__compose-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.admin-messages__compose-field--grow {
+  flex: 1;
+  align-items: flex-start;
+  padding-bottom: 0;
+}
+
+.admin-messages__compose-field label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-gray);
+  width: 56px;
+  flex-shrink: 0;
+}
+
+.admin-messages__compose-to {
+  font-size: 13.5px;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.admin-messages__compose-subject {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--text-dark);
+  background: transparent;
+}
+
+.admin-messages__compose-body {
+  flex: 1;
+  width: 100%;
+  min-height: 200px;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--text-dark);
+  background: transparent;
+  resize: none;
+  line-height: 1.65;
+  padding: 12px 0;
+}
+
+.admin-messages__compose-page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.admin-messages__cancel-compose {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-gray);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.admin-messages__cancel-compose:hover { color: var(--text-dark); }
+
+.admin-messages__send-btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .admin-messages__compose-input {

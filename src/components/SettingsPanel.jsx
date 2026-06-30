@@ -1,21 +1,19 @@
 import { useState, useRef } from 'react'
 import './SettingsPanel.css'
-
-const doctorAvatar = 'https://randomuser.me/api/portraits/women/44.jpg'
-
-const SPECIALTIES = [
-  'Chronic Disease Management',
-  'Therapy & Counseling',
-]
+import BASE_URL from '../api'
 
 export default function SettingsPanel() {
-  const [avatar, setAvatar]         = useState(doctorAvatar)
-  const [name]                      = useState('Dr. Tynisha Obey')
-  const [email, setEmail]           = useState('tynisha.obey@healingbuddy.com')
+  const doctor   = JSON.parse(sessionStorage.getItem('doctorUser') ?? '{}')
+  const userId   = doctor.id ?? ''
+  const fullName = doctor.full_name ?? 'Doctor'
+  const specialty = doctor.specialty ?? ''
+
+  const [avatar, setAvatar]         = useState(
+    doctor.avatar_url ? `${BASE_URL}${doctor.avatar_url}` : null
+  )
+  const [uploading, setUploading]   = useState(false)
+  const [email, setEmail]           = useState(doctor.email ?? '')
   const [emailEdit, setEmailEdit]   = useState(false)
-  const [specialty, setSpecialty]   = useState('Chronic Disease Management')
-  const [gradYear, setGradYear]     = useState('2015')
-  const [gradYearEdit, setGradYearEdit] = useState(false)
   const [certificates, setCertificates] = useState([
     { name: 'Board_Certification_2015.PDF', size: '2.4 MB' },
     { name: 'CME_Certificate_2023.PDF',     size: '1.1 MB' },
@@ -28,12 +26,33 @@ export default function SettingsPanel() {
     reviews:      false,
   })
 
-  const fileRef  = useRef()
-  const certRef  = useRef()
+  const fileRef = useRef()
+  const certRef = useRef()
 
-  function handleAvatarChange(e) {
+  async function handleAvatarChange(e) {
     const file = e.target.files[0]
-    if (file) setAvatar(URL.createObjectURL(file))
+    if (!file) return
+
+    setAvatar(URL.createObjectURL(file))
+    setUploading(true)
+
+    const form = new FormData()
+    form.append('avatar', file)
+
+    try {
+      const res  = await fetch(`${BASE_URL}/users/${userId}/avatar`, { method: 'PATCH', body: form })
+      const data = await res.json()
+      if (data.avatar_url) {
+        const updated = { ...doctor, avatar_url: data.avatar_url }
+        sessionStorage.setItem('doctorUser', JSON.stringify(updated))
+        setAvatar(`${BASE_URL}${data.avatar_url}`)
+      }
+    } catch {
+      // local preview remains
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
   }
 
   function handleCertUpload(e) {
@@ -52,6 +71,10 @@ export default function SettingsPanel() {
     setNotifs(n => ({ ...n, [key]: !n[key] }))
   }
 
+  function getInitials(name) {
+    return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('')
+  }
+
   return (
     <div className="sett">
 
@@ -63,17 +86,32 @@ export default function SettingsPanel() {
           {/* Avatar */}
           <div className="sett__avatar-row">
             <div className="sett__avatar-wrap">
-              <img src={avatar} alt="avatar" className="sett__avatar" />
-              <button className="sett__avatar-edit" onClick={() => fileRef.current.click()}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
+              {avatar ? (
+                <img src={avatar} alt="avatar" className="sett__avatar" />
+              ) : (
+                <div className="sett__avatar sett__avatar--initials">{getInitials(fullName)}</div>
+              )}
+              <button
+                className="sett__avatar-edit"
+                onClick={() => fileRef.current.click()}
+                disabled={uploading}
+                title="Change photo"
+              >
+                {uploading ? (
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" strokeDasharray="31" strokeDashoffset="10"/>
+                  </svg>
+                ) : (
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                )}
               </button>
               <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
             </div>
             <div>
-              <p className="sett__avatar-name">{name}</p>
+              <p className="sett__avatar-name">Dr. {fullName}</p>
               <p className="sett__avatar-role">Doctor · {specialty}</p>
             </div>
           </div>
@@ -84,7 +122,7 @@ export default function SettingsPanel() {
           <div className="sett__field-row">
             <div className="sett__field-info">
               <span className="sett__field-label">Full Name</span>
-              <span className="sett__field-value">{name}</span>
+              <span className="sett__field-value">{fullName}</span>
             </div>
             <span className="sett__field-badge">Managed by admin</span>
           </div>
@@ -117,7 +155,7 @@ export default function SettingsPanel() {
           <div className="sett__field-row">
             <div className="sett__field-info">
               <span className="sett__field-label">Specialty</span>
-              <span className="sett__field-value">{specialty}</span>
+              <span className="sett__field-value">{specialty || '—'}</span>
             </div>
           </div>
 
