@@ -1,0 +1,18 @@
+.newappt__form {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.newappt__field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 130px;
+}
+
+.newappt__submit {
+  flex: 0 0 auto;
+  padding: 0 22px;
+}

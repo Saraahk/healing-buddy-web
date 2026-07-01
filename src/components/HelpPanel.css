@@ -1,0 +1,213 @@
+.help {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+/* ── Header ── */
+.help__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.help__title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.help__subtitle {
+  font-size: 13.5px;
+  color: var(--text-gray);
+}
+
+.help__search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  width: 280px;
+  color: var(--text-gray);
+  transition: border-color 0.15s;
+}
+
+.help__search-wrap:focus-within { border-color: var(--primary); }
+
+.help__search {
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--text-dark);
+  background: transparent;
+  width: 100%;
+}
+
+.help__search::placeholder { color: #9ca3af; }
+
+/* ── Quick links ── */
+.help__quick {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.help__quick-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.12s, border-color 0.15s;
+}
+
+.help__quick-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(106,149,26,0.1);
+  transform: translateY(-2px);
+}
+
+.help__quick-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.help__quick-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* ── FAQ ── */
+.help__faq-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 14px;
+}
+
+.help-faq {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.help-faq__item {
+  border-bottom: 1px solid var(--border);
+}
+
+.help-faq__item:last-child { border-bottom: none; }
+
+.help-faq__question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.help-faq__question:hover { background: #fafafa; }
+.help-faq__item--open .help-faq__question { background: #fafafa; color: var(--primary); }
+
+.help-faq__icon { flex-shrink: 0; color: var(--text-gray); }
+.help-faq__item--open .help-faq__icon { color: var(--primary); }
+
+.help-faq__answer {
+  padding: 0 20px 16px;
+  font-size: 13.5px;
+  color: var(--text-gray);
+  line-height: 1.7;
+  background: #fafafa;
+}
+
+.help__empty {
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-gray);
+}
+
+/* ── Contact card ── */
+.help__contact-card {
+  background: linear-gradient(135deg, #f0f7e2 0%, #e8f5d0 100%);
+  border: 1px solid #d0e8a0;
+  border-radius: 14px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.help__contact-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(106,149,26,0.15);
+}
+
+.help__contact-text { flex: 1; }
+
+.help__contact-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.help__contact-sub {
+  font-size: 13px;
+  color: var(--text-gray);
+  line-height: 1.55;
+}
+
+.help__contact-btn {
+  padding: 11px 24px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.help__contact-btn:hover { opacity: 0.88; }

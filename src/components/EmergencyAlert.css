@@ -1,0 +1,221 @@
+.ea-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ea-overlay--in { opacity: 1; }
+
+.ea-popup {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 20px 60px rgba(220, 38, 38, 0.25), 0 4px 20px rgba(0,0,0,0.15);
+  border-top: 4px solid #ef4444;
+  transform: translateY(30px) scale(0.96);
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  overflow: visible;
+}
+
+.ea-popup--in {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Pulsing rings — centered on the icon */
+.ea-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  border: 2px solid rgba(239, 68, 68, 0.5);
+  pointer-events: none;
+  animation: ea-ring 2.2s ease-out infinite;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.ea-pulse-ring--1 { width: 56px; height: 56px; animation-delay: 0s; }
+.ea-pulse-ring--2 { width: 56px; height: 56px; animation-delay: 0.9s; }
+
+@keyframes ea-ring {
+  0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+}
+
+/* Header */
+.ea-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ea-icon-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ea-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  animation: ea-shake 0.5s ease 0.3s both;
+}
+
+@keyframes ea-shake {
+  0%, 100% { transform: rotate(0deg); }
+  20%       { transform: rotate(-12deg); }
+  40%       { transform: rotate(12deg); }
+  60%       { transform: rotate(-8deg); }
+  80%       { transform: rotate(8deg); }
+}
+
+.ea-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ea-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ef4444;
+  letter-spacing: 0.08em;
+}
+
+.ea-time {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Patient */
+.ea-patient {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.ea-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid #fca5a5;
+}
+
+.ea-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ea-patient-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.ea-patient-sub {
+  font-size: 12.5px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+/* Message */
+.ea-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #92400e;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.ea-message svg { flex-shrink: 0; margin-top: 2px; color: #f97316; }
+
+/* Actions */
+.ea-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ea-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 0;
+  border-radius: 10px;
+  border: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  flex: 1;
+}
+
+.ea-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.ea-btn--call {
+  background: #ef4444;
+  color: #fff;
+  flex: 1.4;
+}
+
+.ea-btn--view {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1.5px solid #e5e7eb;
+}
+
+.ea-btn--dismiss {
+  background: transparent;
+  color: #9ca3af;
+  border: 1.5px solid #e5e7eb;
+  font-size: 13px;
+}
+
+.ea-btn--dismiss:hover { color: #6b7280; background: #f9fafb; }

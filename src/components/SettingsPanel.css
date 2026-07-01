@@ -1,0 +1,421 @@
+.sett {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 24px;
+  max-width: 700px;
+}
+
+/* ── Section ── */
+.sett__section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+  letter-spacing: -0.2px;
+}
+
+/* ── Card ── */
+.sett__card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.sett__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+}
+
+/* ── Avatar row ── */
+.sett__avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+}
+
+.sett__avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sett__avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.sett__avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #4a7c26;
+  background: #d4f0a0;
+  border: 2px solid #b8e07a;
+  flex-shrink: 0;
+}
+
+.sett__avatar-edit {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.12s;
+}
+
+.sett__avatar-edit:hover { opacity: 0.85; }
+
+.sett__avatar-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 3px;
+}
+
+.sett__avatar-role {
+  font-size: 13px;
+  color: var(--text-gray);
+}
+
+/* ── Field row ── */
+.sett__field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+}
+
+.sett__field-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.sett__field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sett__field-value {
+  font-size: 14px;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.sett__inline-input {
+  border: 1.5px solid var(--primary);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-dark);
+  outline: none;
+  width: 100%;
+  max-width: 280px;
+}
+
+.sett__field-badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: var(--text-gray);
+  padding: 4px 10px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.sett__field-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sett__btn-edit {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light);
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  flex-shrink: 0;
+}
+
+.sett__btn-edit:hover { opacity: 0.8; }
+
+.sett__btn-save {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: opacity 0.12s;
+}
+
+.sett__btn-save:hover { opacity: 0.85; }
+
+.sett__btn-cancel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-gray);
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+}
+
+/* ── Password form ── */
+.sett__pass-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.sett__pass-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sett__pass-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: border-color 0.15s;
+}
+
+.sett__pass-input-wrap:focus-within { border-color: var(--primary); }
+
+.sett__pass-icon { color: var(--text-gray); flex-shrink: 0; }
+
+.sett__pass-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: transparent;
+}
+
+.sett__pass-input::placeholder { color: #9ca3af; }
+
+.sett__pass-eye {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-gray);
+  display: flex;
+  align-items: center;
+  transition: color 0.12s;
+}
+
+.sett__pass-eye:hover { color: var(--text-dark); }
+
+.sett__pass-msg {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.sett__pass-msg--success { background: #dcfce7; color: #16a34a; }
+.sett__pass-msg--error   { background: #fee2e2; color: #dc2626; }
+
+.sett__btn-primary {
+  align-self: flex-start;
+  padding: 11px 28px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  margin-top: 4px;
+}
+
+.sett__btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* ── Notifications ── */
+.sett__notif-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 24px;
+}
+
+.sett__notif-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 3px;
+}
+
+.sett__notif-desc {
+  font-size: 12.5px;
+  color: var(--text-gray);
+  line-height: 1.5;
+}
+
+/* Select */
+.sett__select {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  min-width: 240px;
+  transition: border-color 0.15s;
+}
+
+.sett__select:focus { border-color: var(--primary); }
+
+.sett__inline-input--sm { max-width: 120px; }
+
+/* Certificates */
+.sett__certs {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sett__cert-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sett__cert-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sett__cert-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sett__cert-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.sett__cert-size {
+  font-size: 12px;
+  color: var(--text-gray);
+}
+
+.sett__cert-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.12s, background 0.12s;
+}
+
+.sett__cert-remove:hover { color: #ef4444; background: #fee2e2; }
+
+.sett__cert-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background 0.12s;
+  width: 100%;
+  text-align: left;
+}
+
+.sett__cert-add:hover { background: var(--primary-light); }
+
+/* Toggle switch */
+.sett__toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.sett__toggle--on { background: var(--primary); }
+
+.sett__toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+
+.sett__toggle--on .sett__toggle-knob {
+  transform: translateX(20px);
+}

@@ -1,0 +1,229 @@
+.vidcall {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  background: #0a0f0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+}
+
+.vidcall--fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+/* Remote video */
+.vidcall__remote {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111811;
+}
+
+.vidcall__remote-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(2px) brightness(0.5);
+}
+
+/* Connecting state */
+.vidcall__connecting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: rgba(255,255,255,0.7);
+  font-size: 15px;
+}
+
+.vidcall__connecting-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid rgba(106,149,26,0.5);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(106,149,26,0.4); }
+  50% { box-shadow: 0 0 0 16px rgba(106,149,26,0); }
+}
+
+/* PiP local */
+.vidcall__local {
+  position: absolute;
+  bottom: 90px;
+  right: 20px;
+  width: 140px;
+  height: 90px;
+  border-radius: 12px;
+  background: #1e2d1e;
+  border: 2px solid rgba(255,255,255,0.15);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.vidcall__local--off {
+  background: #111;
+  color: rgba(255,255,255,0.4);
+}
+
+.vidcall__local-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+}
+
+/* Top bar */
+.vidcall__topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 24px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+.vidcall__patient-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vidcall__top-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.vidcall__top-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.vidcall__top-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+}
+
+.vidcall__timer {
+  font-size: 14px;
+  font-weight: 600;
+  color: #a8d57a;
+  font-variant-numeric: tabular-nums;
+  background: rgba(0,0,0,0.4);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* Bottom controls */
+.vidcall__controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 24px 28px;
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+.vidcall__ui--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Control button */
+.vidcall__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.12);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  font-family: inherit;
+  backdrop-filter: blur(8px);
+  min-width: 60px;
+}
+
+.vidcall__btn span {
+  font-size: 10px;
+  color: rgba(255,255,255,0.65);
+}
+
+.vidcall__btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.vidcall__btn--off {
+  background: rgba(239,68,68,0.25);
+  color: #fca5a5;
+}
+
+.vidcall__btn--off span {
+  color: #fca5a5;
+}
+
+.vidcall__btn--sharing {
+  background: rgba(106,149,26,0.3);
+  color: #a8d57a;
+}
+
+.vidcall__btn--sharing span {
+  color: #a8d57a;
+}
+
+/* End call */
+.vidcall__end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 14px;
+  background: #ef4444;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 4px 16px rgba(239,68,68,0.4);
+  min-width: 60px;
+}
+
+.vidcall__end span {
+  font-size: 10px;
+  color: rgba(255,255,255,0.85);
+}
+
+.vidcall__end:hover {
+  background: #dc2626;
+  transform: scale(1.03);
+}

@@ -1,0 +1,88 @@
+.features {
+  padding: 72px 0;
+  background: #F2F9E8;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(120, 163, 41, 0.15);
+}
+
+.features__track-wrapper {
+  overflow: hidden;
+  width: 100%;
+  padding: 16px 0;
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.features__track {
+  display: flex;
+  gap: 24px;
+  width: max-content;
+  animation: carousel-scroll 28s linear infinite;
+}
+
+.features__track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes carousel-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.features__card {
+  width: 270px;
+  height: 190px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(120, 163, 41, 0.12);
+  padding: 28px 24px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  cursor: default;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.features__card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.09);
+}
+
+/* avatar — نفس حجم وشكل الـ icon placeholder */
+.features__card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+/* اسم — نفس موضع الـ line الأولى */
+.features__card-line {
+  border-radius: 6px;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* تخصص + نجوم — نفس موضع الـ line القصيرة */
+.features__card-line--short {
+  width: 65%;
+  font-size: 11px;
+  color: #6b7280;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.features__card-rating {
+  font-size: 11px;
+  font-weight: 700;
+  color: #f59e0b;
+  margin-left: 4px;
+}

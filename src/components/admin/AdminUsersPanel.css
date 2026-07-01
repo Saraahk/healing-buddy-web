@@ -1,0 +1,176 @@
+.admin-users {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Role tabs */
+.admin-users__tabs {
+  display: flex;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+}
+
+.admin-users__tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-gray);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.admin-users__tab:hover { background: #f9fafb; color: var(--text-dark); }
+
+.admin-users__tab--active {
+  background: #fff;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.admin-users__tab-badge {
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 2px 7px;
+  transition: all 0.15s;
+}
+
+/* Toolbar */
+.admin-users__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-users__search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 14px;
+  color: var(--text-gray);
+  width: 280px;
+}
+
+.admin-users__search {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-dark);
+  width: 100%;
+}
+.admin-users__search::placeholder { color: #9ca3af; }
+
+.admin-users__filters { display: flex; gap: 6px; }
+
+.admin-users__filter-btn {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-gray);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.admin-users__filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+.admin-users__filter-btn--active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+/* Table */
+.admin-users__table-wrap {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.admin-users__table { width: 100%; border-collapse: collapse; }
+
+.admin-users__table thead tr {
+  border-bottom: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.admin-users__table th {
+  padding: 12px 18px;
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.admin-users__table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.1s;
+}
+.admin-users__table tbody tr:last-child { border-bottom: none; }
+.admin-users__table tbody tr:hover { background: var(--primary-light); }
+.admin-users__table td { padding: 13px 18px; vertical-align: middle; }
+
+.admin-users__user-cell { display: flex; align-items: center; gap: 12px; }
+
+.admin-users__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-users__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 2px;
+}
+
+.admin-users__email { font-size: 11.5px; color: var(--text-gray); }
+
+.admin-users__cell-text { font-size: 13px; color: var(--text-dark); }
+.admin-users__doctor-text { font-size: 12.5px; color: var(--primary); font-weight: 500; }
+.admin-users__count { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+.admin-users__date { font-size: 12.5px; color: var(--text-gray); }
+
+.admin-users__status {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 3px 10px;
+}
+.admin-users__status--active   { background: #dcfce7; color: #16a34a; }
+.admin-users__status--inactive { background: #f3f4f6; color: #6b7280; }
+
+.admin-users__empty {
+  padding: 40px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
